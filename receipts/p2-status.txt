@@ -1,0 +1,2 @@
+errors=1
+Bonnifaci/Lemma41.lean:111:67: error: Type mismatch

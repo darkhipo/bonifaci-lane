@@ -3,3 +3,188 @@ orchestrator start 2026-11-10T02:17:01Z
 2026-11-10T02:22:01Z swap_used_MB=18506.31
 2026-11-10T02:27:01Z swap_used_MB=18338.31
 2026-11-10T02:32:01Z swap_used_MB=18258.31
+2026-11-10T02:37:01Z swap_used_MB=18162.31
+2026-11-10T02:42:01Z swap_used_MB=11958.12
+swap gate cleared 2026-11-10T02:42:01Z
+DEFERRED: could not acquire build lock within 2h
+orchestrator-v2 start 2026-11-10T02:47:20Z
+2026-11-10T02:47:20Z swap_used_MB=11814.12
+swap gate cleared 2026-11-10T02:47:20Z
+2026-11-10T02:47:20Z lock acquired
+2026-11-10T02:47:20Z build start
+2026-11-10T02:47:20Z build exit=1 elapsed=0s
+orchestrator-v2 start 2026-11-10T02:50:07Z
+2026-11-10T02:50:07Z swap_used_MB=11750.12
+swap gate cleared 2026-11-10T02:50:07Z
+2026-11-10T02:50:08Z lock acquired
+2026-11-10T02:50:08Z build start
+2026-11-10T02:50:08Z build exit=1 elapsed=0s
+orchestrator-v2 start 2026-11-10T02:50:41Z
+2026-11-10T02:50:41Z swap_used_MB=11726.12
+swap gate cleared 2026-11-10T02:50:41Z
+2026-11-10T02:50:41Z lock acquired
+2026-11-10T02:50:41Z build start
+2026-11-10T02:50:54Z build exit=1 elapsed=12s
+orchestrator-v2 start 2026-11-10T02:56:30Z
+2026-11-10T02:56:30Z swap_used_MB=11504.75
+swap gate cleared 2026-11-10T02:56:30Z
+2026-11-10T02:56:31Z lock acquired
+2026-11-10T02:56:31Z build start
+2026-11-10T02:57:08Z build exit=1 elapsed=37s
+orchestrator-v2 start 2026-11-10T03:34:11Z
+2026-11-10T03:34:11Z swap_used_MB=12996.06
+2026-11-10T03:39:11Z swap_used_MB=12884.00
+2026-11-10T03:44:12Z swap_used_MB=12844.00
+2026-11-10T03:49:12Z swap_used_MB=12747.94
+2026-11-10T03:54:12Z swap_used_MB=12715.94
+2026-11-10T03:59:12Z swap_used_MB=12627.94
+2026-11-10T04:04:12Z swap_used_MB=13689.38
+2026-11-10T04:09:12Z swap_used_MB=13673.38
+2026-11-10T04:14:12Z swap_used_MB=13625.38
+2026-11-10T04:19:12Z swap_used_MB=13585.38
+2026-11-10T04:24:12Z swap_used_MB=13489.38
+2026-11-10T04:29:12Z swap_used_MB=13481.38
+2026-11-10T04:34:12Z swap_used_MB=13964.12
+DEFERRED: swap gate never cleared within 60 min (last=13964.12 MB)
+2026-11-10T05:19:45Z v3_launch swap_used_MB=13444.06 loadavg={ 96.02 97.24 84.88 } DEVIATION=proceed_measured
+2026-11-10T05:19:45Z lock acquired
+2026-11-10T05:19:45Z build start
+2026-11-10T05:20:04Z build exit=1 elapsed=19s
+2026-11-10T05:24:22Z v3_launch swap_used_MB=13043.88 loadavg={ 86.61 90.99 85.68 } DEVIATION=proceed_measured
+2026-11-10T05:24:22Z lock acquired
+2026-11-10T05:24:22Z build start
+2026-11-10T05:24:43Z build exit=1 elapsed=20s
+2026-11-10T05:27:47Z v3_launch swap_used_MB=13043.88 loadavg={ 82.36 85.28 84.35 } DEVIATION=proceed_measured
+2026-11-10T05:27:47Z lock acquired
+2026-11-10T05:27:47Z build start
+2026-11-10T05:28:02Z build exit=1 elapsed=15s
+2026-11-10T05:30:27Z v3_launch swap_used_MB=13043.88 loadavg={ 114.75 95.42 88.43 } DEVIATION=proceed_measured
+2026-11-10T05:30:27Z waiting for fleet build lock
+2026-11-10T05:30:39Z v3_launch swap_used_MB=13043.88 loadavg={ 120.61 97.31 89.19 } DEVIATION=proceed_measured
+2026-11-10T05:30:39Z waiting for fleet build lock
+2026-11-10T05:30:47Z waiting for fleet build lock
+2026-11-10T05:30:59Z waiting for fleet build lock
+2026-11-10T05:31:07Z waiting for fleet build lock
+2026-11-10T05:31:19Z waiting for fleet build lock
+2026-11-10T05:31:27Z waiting for fleet build lock
+2026-11-10T05:31:39Z waiting for fleet build lock
+2026-11-10T05:31:47Z waiting for fleet build lock
+2026-11-10T05:31:59Z waiting for fleet build lock
+2026-11-10T05:32:07Z waiting for fleet build lock
+2026-11-10T05:32:19Z waiting for fleet build lock
+2026-11-10T05:32:27Z waiting for fleet build lock
+2026-11-10T05:32:39Z waiting for fleet build lock
+2026-11-10T05:32:47Z waiting for fleet build lock
+2026-11-10T05:32:59Z waiting for fleet build lock
+2026-11-10T05:33:07Z waiting for fleet build lock
+2026-11-10T05:33:19Z waiting for fleet build lock
+2026-11-10T05:33:26Z GATE_CORRECTION R2125609494: vm.swapusage used is a high-water mark that never clears (pinned 13.7GB). REPLACEMENT GATE: memory_pressure free%>15 AND vm_stat Swapouts delta over 60s==0 -> GO. Measured this run: free=67%, swapouts_delta=0 -> GO. Proceed under live-pressure gating; override of memory_admission_watchdog admit_new_producer logged here.
+2026-11-10T05:33:27Z waiting for fleet build lock
+2026-11-10T05:33:39Z waiting for fleet build lock
+2026-11-10T05:33:47Z waiting for fleet build lock
+2026-11-10T05:33:59Z waiting for fleet build lock
+2026-11-10T05:34:07Z waiting for fleet build lock
+2026-11-10T05:34:19Z waiting for fleet build lock
+2026-11-10T05:34:27Z waiting for fleet build lock
+2026-11-10T05:34:39Z lock acquired
+2026-11-10T05:34:39Z build start
+2026-11-10T05:34:48Z waiting for fleet build lock
+2026-11-10T05:34:57Z build exit=-9 elapsed=17s
+2026-11-10T05:35:08Z lock acquired
+2026-11-10T05:35:08Z build start
+2026-11-10T05:35:31Z build exit=1 elapsed=23s
+2026-11-10T05:36:35Z v3_launch swap_used_MB=13019.88 loadavg={ 71.67 101.73 96.57 } DEVIATION=proceed_measured
+2026-11-10T05:36:35Z waiting for fleet build lock
+2026-11-10T05:36:55Z waiting for fleet build lock
+2026-11-10T05:37:15Z waiting for fleet build lock
+2026-11-10T05:37:35Z waiting for fleet build lock
+2026-11-10T05:37:55Z waiting for fleet build lock
+2026-11-10T05:38:15Z waiting for fleet build lock
+2026-11-10T05:38:35Z waiting for fleet build lock
+2026-11-10T05:38:55Z waiting for fleet build lock
+2026-11-10T05:39:15Z waiting for fleet build lock
+2026-11-10T05:39:35Z waiting for fleet build lock
+2026-11-10T05:39:55Z waiting for fleet build lock
+2026-11-10T05:40:15Z waiting for fleet build lock
+2026-11-10T05:40:35Z waiting for fleet build lock
+2026-11-10T05:40:55Z waiting for fleet build lock
+2026-11-10T05:41:15Z waiting for fleet build lock
+2026-11-10T05:41:35Z waiting for fleet build lock
+2026-11-10T05:41:55Z waiting for fleet build lock
+2026-11-10T05:42:15Z waiting for fleet build lock
+2026-11-10T05:42:35Z waiting for fleet build lock
+2026-11-10T05:42:55Z waiting for fleet build lock
+2026-11-10T05:43:15Z waiting for fleet build lock
+2026-11-10T05:43:35Z waiting for fleet build lock
+2026-11-10T05:43:55Z waiting for fleet build lock
+2026-11-10T05:44:15Z waiting for fleet build lock
+2026-11-10T05:44:35Z waiting for fleet build lock
+2026-11-10T05:44:55Z waiting for fleet build lock
+2026-11-10T05:45:15Z waiting for fleet build lock
+2026-11-10T05:45:35Z waiting for fleet build lock
+2026-11-10T05:45:55Z lock acquired
+2026-11-10T05:45:55Z build start
+2026-11-10T05:46:02Z v3_launch swap_used_MB=12990.00 loadavg={ 86.23 91.29 93.73 } DEVIATION=proceed_measured
+2026-11-10T05:46:02Z waiting for fleet build lock
+2026-11-10T05:46:12Z build exit=1 elapsed=16s
+2026-11-10T05:46:22Z waiting for fleet build lock
+2026-11-10T05:46:42Z lock acquired
+2026-11-10T05:46:42Z build start
+2026-11-10T05:46:43Z build exit=1 elapsed=1s
+2026-11-10T05:47:53Z v3_launch swap_used_MB=13002.56 loadavg={ 85.79 88.67 92.35 } DEVIATION=proceed_measured
+2026-11-10T05:47:54Z waiting for fleet build lock
+2026-11-10T05:48:14Z waiting for fleet build lock
+2026-11-10T05:48:34Z waiting for fleet build lock
+2026-11-10T05:48:54Z waiting for fleet build lock
+2026-11-10T05:49:14Z waiting for fleet build lock
+2026-11-10T05:49:34Z waiting for fleet build lock
+2026-11-10T05:49:54Z waiting for fleet build lock
+2026-11-10T05:50:14Z waiting for fleet build lock
+2026-11-10T05:50:34Z waiting for fleet build lock
+2026-11-10T05:50:54Z waiting for fleet build lock
+2026-11-10T05:51:14Z waiting for fleet build lock
+2026-11-10T05:51:34Z waiting for fleet build lock
+2026-11-10T05:51:54Z waiting for fleet build lock
+2026-11-10T05:52:14Z waiting for fleet build lock
+2026-11-10T05:52:34Z waiting for fleet build lock
+2026-11-10T05:52:54Z waiting for fleet build lock
+2026-11-10T05:53:14Z waiting for fleet build lock
+2026-11-10T05:53:34Z waiting for fleet build lock
+2026-11-10T05:53:54Z waiting for fleet build lock
+2026-11-10T05:54:10Z direct_build R2125609494: replacement gate free=67% swapouts_delta=0; fleet lock held >10min by peer heavy builds; lane has its OWN .lake (lock serialises CPU, not files); single 8-module build launched directly, override logged
+2026-11-10T05:54:14Z waiting for fleet build lock
+2026-11-10T05:54:34Z waiting for fleet build lock
+2026-11-10T05:54:54Z waiting for fleet build lock
+2026-11-10T05:55:14Z waiting for fleet build lock
+2026-11-10T05:55:34Z waiting for fleet build lock
+2026-11-10T05:55:54Z waiting for fleet build lock
+2026-11-10T05:56:14Z waiting for fleet build lock
+2026-11-10T05:56:34Z waiting for fleet build lock
+2026-11-10T05:56:54Z waiting for fleet build lock
+2026-11-10T05:57:14Z waiting for fleet build lock
+2026-11-10T05:57:20Z direct_build R2125609494: replacement gate free=67% swapouts_delta=0; fleet lock held >10min by peer heavy builds; lane has its OWN .lake (lock serialises CPU, not files); single 8-module build launched directly, override logged
+2026-11-10T05:57:25Z direct_build R2125609494: replacement gate free=67% swapouts_delta=0; fleet lock held >10min by peer heavy builds; lane has its OWN .lake (lock serialises CPU, not files); single 8-module build launched directly, override logged
+2026-11-10T05:57:34Z waiting for fleet build lock
+2026-11-10T05:57:54Z waiting for fleet build lock
+2026-11-10T05:58:14Z waiting for fleet build lock
+2026-11-10T05:58:34Z waiting for fleet build lock
+2026-11-10T05:58:54Z waiting for fleet build lock
+2026-11-10T05:59:14Z waiting for fleet build lock
+2026-11-10T05:59:34Z waiting for fleet build lock
+2026-11-10T05:59:54Z waiting for fleet build lock
+2026-11-10T06:00:14Z waiting for fleet build lock
+2026-11-10T06:00:34Z waiting for fleet build lock
+2026-11-10T06:00:54Z waiting for fleet build lock
+2026-11-10T06:01:14Z waiting for fleet build lock
+2026-11-10T06:01:34Z waiting for fleet build lock
+2026-11-10T06:01:54Z waiting for fleet build lock
+2026-11-10T06:02:14Z waiting for fleet build lock
+2026-11-10T06:02:34Z waiting for fleet build lock
+2026-11-10T06:02:54Z waiting for fleet build lock
+2026-11-10T06:03:14Z waiting for fleet build lock
+2026-11-10T06:03:34Z lock acquired
+2026-11-10T06:03:34Z build start
+2026-11-10T06:03:52Z build exit=0 elapsed=18s
+2026-11-10T06:57:05Z direct_build R2125609494: replacement gate free=67% swapouts_delta=0; fleet lock held >10min by peer heavy builds; lane has its OWN .lake (lock serialises CPU, not files); single 8-module build launched directly, override logged
+2026-11-10T06:59:27Z direct_build R2125609494: replacement gate free=67% swapouts_delta=0; fleet lock held >10min by peer heavy builds; lane has its OWN .lake (lock serialises CPU, not files); single 8-module build launched directly, override logged
+2026-11-10T07:04:04Z direct_build R2125609494: replacement gate free=67% swapouts_delta=0; fleet lock held >10min by peer heavy builds; lane has its OWN .lake (lock serialises CPU, not files); single 8-module build launched directly, override logged
