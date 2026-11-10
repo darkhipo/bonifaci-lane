@@ -1,9 +1,9 @@
 name = "bonifaci-lane"
 version = "0.1.0"
-defaultTargets = ["Submission"]
+defaultTargets = ["Bonnifaci"]
 
 [[lean_lib]]
-name = "Submission"
+name = "Bonnifaci"
 [lean_lib.leanOptions]
 autoImplicit = false
 

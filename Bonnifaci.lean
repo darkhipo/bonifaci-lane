@@ -10,5 +10,6 @@ import Bonnifaci.Model
 import Bonnifaci.KL
 import Bonnifaci.Core
 import Bonnifaci.Optimality
+import Bonnifaci.Duality
 import Bonnifaci.Features
 import Bonnifaci.Thm11

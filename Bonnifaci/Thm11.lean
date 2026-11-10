@@ -256,14 +256,14 @@ theorem thm11
       (hlogdiff.differentiableOn.mono interior_subset) fun u hu => ?_
     have h2 : Real.sqrt (d.energyAt S u / d.cost (S.x u)) ≤ 1 := by
       rw [Real.sqrt_le_iff]
-      exact ⟨by norm_num, by simpa using div_le_one (hcostpos u) (hEle u)⟩
+      exact ⟨by norm_num, by simpa using (div_le_one (hcostpos u)).2 (hEle u)⟩
     linarith [hcostlog u, h2]
   have hcostanti : ∀ u ∈ Set.Icc 0 t, d.cost (S.x t) ≤ d.cost (S.x u) := by
     intro u hu
     have h1 := hloganti u hu t ⟨ht0, le_refl t⟩ hu.2
     have h2 : d.cost (S.x t) / d.cost xstar ≤ d.cost (S.x u) / d.cost xstar :=
       (Real.log_le_log_iff (hcostpos u) (hcostpos t)).1 h1
-    rwa [div_le_div_iff₀ hoptpos hoptpos] at h2
+    rwa [div_le_div_iff_of_pos_right hoptpos] at h2
   -- while superoptimal, Φ' ≤ −ε/6
   have hPhi' : ∀ u ∈ Set.Ioo (0 : ℝ) t, deriv (d.Phi S xstar) u ≤ -ε / 6 := by
     intro u hu
@@ -300,8 +300,7 @@ theorem thm11
       funext fun v => d.Phi_eq_paper S xstar hxstar hbnz hfeas v
     have hklD := differentiable_kl d S xstar hxstar hbnz hfeas
     have hdg : deriv (fun v : ℝ => (ε / 6) * v) u = ε / 6 := by
-      have hdm := deriv_const_mul (f := fun v : ℝ => v) differentiableAt_const
-        differentiableAt_id
+      have hdm := deriv_const_mul (ε / 6) differentiableAt_id
       simpa using hdm
     rw [hΦeq, deriv_add (hlogdiff u) (hklD u), hdg]
     linarith [hPhi' u hu, hcostlog u, hkl u]
@@ -328,9 +327,12 @@ theorem thm11
       Real.log_nonneg (div_nonneg (le_trans (hopt (hfeas t)) le_rfl) hoptpos.le)
     linarith
   have hcosteq : d.cost (S.x t) = d.cost xstar := by
-    have h1 : d.cost (S.x t) / d.cost xstar = 1 :=
-      (Real.log_eq_zero (ne_of_gt (div_pos (hcostpos t) hoptpos))).1 hlogz
-    rwa [div_eq_one_iff_eq hoptpos] at h1
+    rcases Real.log_eq_zero.1 hlogz with h0 | h1 | hneg
+    · exact absurd (div_pos (hcostpos t) hoptpos) (by rw [h0]; linarith)
+    · have h2 : d.cost (S.x t) = d.cost xstar * (d.cost (S.x t) / d.cost xstar) := by
+        field_simp
+      rw [h2, h1, mul_one]
+    · exact absurd (div_pos (hcostpos t) hoptpos) (by rw [hneg]; linarith)
   rw [hcosteq]
   exact le_mul_of_one_le_right hoptpos.le (by linarith)
 
