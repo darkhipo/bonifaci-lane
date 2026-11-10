@@ -1,0 +1,76 @@
+# attempt 1 target=Bonnifaci jobs=2 load1=112.5
+⚠ [2185/2256] Replayed Bonnifaci.Thm11
+warning: Bonnifaci/Thm11.lean:60:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:275:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:334:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [2188/2256] Replayed Bonnifaci.Lemma43
+warning: Bonnifaci/Lemma43.lean:87:5: Variable name `hxstar` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hxstar
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2207/2256] Built Mathlib.Logic.Small.List (1.0s)
+✔ [2208/2256] Built Mathlib.Algebra.Order.SuccPred.PartialSups (2.3s)
+✔ [2209/2256] Built Mathlib.Algebra.Module.Submodule.IterateMapComap (2.3s)
+✔ [2210/2256] Built Mathlib.Order.Cofinal (2.3s)
+✔ [2211/2256] Built Mathlib.Order.SuccPred.InitialSeg (2.3s)
+✔ [2212/2256] Built Mathlib.Order.Shrink (2.3s)
+✔ [2213/2256] Built Mathlib.Order.DirSupClosed (2.6s)
+✔ [2214/2256] Built Mathlib.Algebra.Module.Congruence.Defs (2.8s)
+✔ [2215/2256] Built Mathlib.RingTheory.Finiteness.Lattice (2.7s)
+✔ [2216/2256] Built Mathlib.LinearAlgebra.Basis.Submodule (3.0s)
+✔ [2217/2256] Built Mathlib.LinearAlgebra.Dimension.Basic (3.2s)
+✔ [2218/2256] Built Mathlib.SetTheory.Cardinal.Cofinality.Basic (1.8s)
+✔ [2219/2256] Built Mathlib.Order.IsNormal (1.8s)
+✔ [2220/2256] Built Mathlib.LinearAlgebra.Dimension.Subsingleton (1.3s)
+✔ [2221/2256] Built Mathlib.LinearAlgebra.Dimension.Finrank (1.4s)
+✔ [2222/2256] Built Mathlib.Algebra.Exact.Basic (5.1s)
+✔ [2223/2256] Built Mathlib.RingTheory.Finiteness.Finsupp (1.7s)
+✔ [2224/2256] Built Mathlib.SetTheory.Ordinal.Basic (3.4s)
+✔ [2225/2256] Built Mathlib.SetTheory.Ordinal.Univ (1.2s)
+✔ [2226/2256] Built Mathlib.SetTheory.Ordinal.Arithmetic (2.5s)
+✔ [2227/2256] Built Mathlib.SetTheory.Ordinal.Family (1.9s)
+✔ [2228/2256] Built Mathlib.SetTheory.Ordinal.Enum (1.2s)
+✔ [2229/2256] Built Mathlib.SetTheory.Cardinal.Cofinality.Enum (1.5s)
+✔ [2230/2256] Built Mathlib.SetTheory.Ordinal.Exponential (1.5s)
+✔ [2231/2256] Built Mathlib.SetTheory.Ordinal.FixedPoint (1.2s)
+✔ [2232/2256] Built Mathlib.SetTheory.Ordinal.Principal (1.4s)
+✔ [2233/2256] Built Mathlib.SetTheory.Cardinal.Aleph (2.1s)
+✔ [2234/2256] Built Mathlib.SetTheory.Cardinal.Arithmetic (2.5s)
+✔ [2235/2256] Built Mathlib.SetTheory.Cardinal.Finsupp (1.4s)
+✔ [2236/2256] Built Mathlib.SetTheory.Cardinal.Ordinal (1.6s)
+✔ [2237/2256] Built Mathlib.SetTheory.Cardinal.Cofinality.Ordinal (2.1s)
+✔ [2238/2256] Built Mathlib.SetTheory.Ordinal.FundamentalSequence (1.2s)
+✔ [2239/2256] Built Mathlib.SetTheory.Cardinal.Regular (1.3s)
+✔ [2240/2256] Built Mathlib.SetTheory.Cardinal.Pigeonhole (942ms)
+✔ [2241/2256] Built Mathlib.LinearAlgebra.Basis.Cardinality (1.5s)
+✔ [2242/2256] Built Mathlib.RingTheory.Finiteness.Cardinality (1.6s)
+✔ [2243/2256] Built Mathlib.RingTheory.OrzechProperty (1.2s)
+✔ [2244/2256] Built Mathlib.LinearAlgebra.FreeModule.Finite.Basic (1.2s)
+✔ [2245/2256] Built Mathlib.RingTheory.Noetherian.Basic (1.8s)
+✔ [2246/2256] Built Mathlib.RingTheory.Noetherian.Orzech (1.0s)
+✔ [2247/2256] Built Mathlib.LinearAlgebra.InvariantBasisNumber (1.6s)
+✔ [2248/2256] Built Mathlib.LinearAlgebra.Dimension.StrongRankCondition (1.8s)
+✔ [2249/2256] Built Mathlib.LinearAlgebra.Dimension.Free (1.7s)
+✔ [2250/2256] Built Mathlib.LinearAlgebra.FiniteDimensional.Defs (1.3s)
+✔ [2251/2256] Built Mathlib.LinearAlgebra.Dimension.Constructions (2.2s)
+✔ [2252/2256] Built Mathlib.LinearAlgebra.Dimension.Finite (1.8s)
+✔ [2253/2256] Built Mathlib.LinearAlgebra.FiniteDimensional.Basic (2.3s)
+✔ [2254/2256] Built Bonnifaci.M6 (6.3s)
+✔ [2255/2256] Built Bonnifaci (1.0s)
+Build completed successfully (2256 jobs).

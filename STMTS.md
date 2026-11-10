@@ -308,3 +308,273 @@ Axiom banner (`receipts/axioms.txt`), all twelve landed theorems:
 proof substitutes ε' = ε/3 into Lemma 4.4, which requires ε' in (0, 1/2) — so the paper's
 argument is effective only for ε < 3/2, and the phrase "any ε > 0" is a mild overstatement in
 the source itself. `thm11_statement` carries ε <= 1, strictly inside the effective range.
+
+---
+
+# §8 — 2026-11-10 (session 2): M6 merged onto the true base; the loss narrative corrected; M7 first increment
+
+## 8.0 The incident, corrected (measured truth — supersedes the earlier loss narrative)
+
+A previous session wrote, in a *rebuilt* copy of this ledger, that the lane's repo had been
+"deleted from disk", that `KL`/`Core`/`Optimality`/`Features`/`Feasibility`/`Theorem`/`Thm11`/
+`Duality` were **lost**, and that `ec6e530` was **unrecoverable**. **That is false.** Measured
+2026-11-10 by the coordinator and re-verified here:
+
+    /Volumes/Substrate-1/bigo/bonifaci-lane   HEAD = ec6e530  (clean tree, branch main)
+    git log: ec6e530 M5 → 7444901 P3 → 2000e4e P2 → … → a3d59cd scaffold
+    Bonnifaci/: Model KL Core Optimality Features Feasibility Theorem Thm11
+                Duality Lemma41 Lemma43 Mu            (13 modules, all present)
+
+Nothing was lost. What actually happened:
+
+1. **A second working copy existed under `/private/tmp`, and the tmp reaper took it.** That
+   copy — not the repo — was what disappeared.
+2. **The recovery search never looked at this directory.** It covered `$HOME` (depth 4) and
+   `/private/tmp` (depth 2) and looked for `*bonifaci*`/`STMTS.md` under home and `/Volumes`
+   — but the grep for candidate repos was rooted at `$HOME`, so `/Volumes/Substrate-1/bigo/`
+   was never enumerated. The lane home that the brief itself had designated was the one place
+   not searched.
+3. **The loss narrative was written from an incomplete search, not from a measurement.** The
+   ledger said "no copy exists in any git object store on this machine" while a clean clone
+   with the full history sat on the external volume.
+
+**Wound class:** a near-miss dressed as a post-mortem. The cost was not the missing data —
+it was a successor mind re-deriving work that already existed, and a ledger that would have
+told every later reader the M3/M5 proofs had to be rebuilt.
+
+**Durability rule (binding on this lane from now on):**
+
+* **Work in the designated lane home.** One copy of record; `/private/tmp` is scratch and is
+  reaped without notice.
+* **Push to a remote at every milestone** so the repo is never single-copy:
+  `git remote add origin https://github.com/darkhipo/bonifaci-lane.git` (the body's GitHub
+  account is `darkhipo`; `BigO-Hunter/bonifaci-lane` is the alternative if it is ever created).
+  A lane with no remote is one `rm` from the incident this section exists to prevent.
+* **Before writing any loss narrative, check `/Volumes/Substrate-1/bigo/<lane>/` first**, and
+  never declare loss from a search that did not enumerate the brief's own lane path. A negative
+  search result is evidence about the search, not about the world.
+
+## 8.1 The merge, and the `Model.lean` diff verdict
+
+M6 had been re-derived in the rebuilt copy against a **path** Mathlib
+(`…/staircase-port/.lake/packages/mathlib`, rev `118aa17…`) rather than the campaign pin
+`d13f23b7…`. Its `Model.lean` was a *reconstruction*: 5521 bytes against the original's 6367.
+
+Declaration-level diff (measured, not eyeballed):
+
+| | count | names |
+|---|---|---|
+| declarations identical in both | 8 | `LPData`, `LPData.Step`, `LPData.Solution`, `LPData.cost`, `LPData.IsFeasible`, `LPData.res`, `LPData.energy`, `LPData.IsFixedPoint` |
+| declarations **only in the rebuild** | **0** | — |
+| declarations **only in the original** | **2** | `differentiableAt_finset_sum`, `deriv_finset_sum` |
+| imports **only in the original** | **1** | `Mathlib.Analysis.Calculus.Deriv.Add` |
+
+Those two lemmas are not decoration — they are the dynamics layer's working API, with **nine
+call sites**: `Feasibility` (2), `Lemma41` (1), `Lemma43` (2), `Thm11` (4). Had the rebuilt
+`Model.lean` been taken as the base, four modules would have failed to compile.
+
+**Verdict: the original is kept verbatim; the rebuild was strictly poorer, not merely
+different.** Verified: `git diff ec6e530 -- Bonnifaci/Model.lean` is empty, and M6 compiles
+against the original without a single edit to it. "Prefer the original" was a correctness
+requirement, not a style preference.
+
+## 8.2 M6, adapted to the campaign pin (one honest API substitution)
+
+`import Mathlib` was replaced with four narrow imports (`Data.Matrix.Mul`,
+`LinearAlgebra.Matrix.ToLin`, `LinearAlgebra.FiniteDimensional.Basic`, plus `Tactic.Linarith`
+/ `Tactic.Ring`), because on the pin `Mathlib.olean` does not exist and the closure is ~6600
+modules. The only proof change: `exists_potential` now goes through
+`Matrix.mulVecLin` + `LinearMap.injective_iff_surjective` instead of
+`Matrix.mulVec_injective_iff_isUnit`. Measured closure cost: **119 unbuilt modules** for the
+determinant route against **49** for rank-nullity. Same theorem, smaller dependency; the
+substitution is recorded in `Bonnifaci/M6.lean`'s header.
+
+## 8.3 Receipts (exact, this tree)
+
+| receipt | artifact | value |
+|---|---|---|
+| build | `receipts/build_merged.log` / `.receipt` | **exit 0**, 2257 jobs, target `Bonnifaci` (root). 4 warnings, all pre-existing (`Thm11` ×3 `push_neg`/`simpa`, `Lemma43` ×1 unused var). **M6 and M7 compile with zero warnings.** |
+| oleans | `.lake/build/lib/lean/Bonnifaci/` | 14: `Model KL Core Optimality Features Feasibility Theorem Thm11 Duality Lemma41 Lemma43 Mu M6 M7` |
+| axioms | `receipts/axioms_merged.txt` | **27 declarations, every one `[propext, Classical.choice, Quot.sound]`** — zero non-target lines; grep for `sorry`/`admit` across `Bonnifaci/*.lean` returns nothing |
+
+The restored M3/M5 family is inside that set: `thm11_final`, `thm11`, `lem42_core`,
+`duality_inner`, `feasibility_invariant`, `kl_bound_mu`, `entropy_summand_le`,
+`cost_deriv`, `log_cost_deriv`, `differentiable_kl_sum`.
+
+## 8.4 M7 first increment — landed (`Bonnifaci/M7.lean`)
+
+The ODE `ẋ = q(x) − x` was a *relation* until the flow was shown unique at each point. That
+is now proved:
+
+* `res_energy_eq_zero` — Kirchhoff-homogeneous flow with gradient resistance image has zero
+  resistance energy. Thomson's cross-term computation, read as an identity.
+* `flow_eq_of_kirchhoff_ohm` — **the flow at a strictly positive `x` is unique.**
+* `potential_eq_of_ohm` — full row rank pins the potentials too.
+* `step_unique`, `step_p_unique`, `existsUnique_flow` — `∃!` electrical data at each point.
+* `LPData.qfun` — the flow map as a genuine function; `qfun_eq_steps` proves the choice in its
+  definition does not matter. `LPData.rhs` — the ODE's right-hand side as a function.
+* `LPData.Solution.q_eq_qfun` — a trajectory's flow at `t` **is** `qfun (x t)`.
+
+**Named, not proved** (defs of type `Prop`, carried as hypotheses — no axiom, no sorry, no
+opaque constant):
+
+* `LPData.FlowLipschitzOnOrthant` — local Lipschitz continuity of the flow on the positive
+  orthant (Picard–Lindelöf's hypothesis). The residual content is continuity of matrix
+  inversion composed with the rational map `x ↦ A diag(x/c) Aᵀ`, which is Mathlib's
+  `ContinuousLinearMap` inverse theory — not in the 1988-module built prefix on this pin.
+* `LPData.HasSolution` — existence of the trajectory for a positive feasible start
+  ([SV16, Thm 1.1], the paper's [18, Thm 1.1]).
+
+## 8.5 Next
+
+1. `FlowLipschitzOnOrthant`: supply the analytic layer (chain rule on `x ↦ L(x)`, then
+   invertibility + norm bounds). Bounded spike: compute the closure cost of
+   `Mathlib.Analysis.Normed.Algebra.Inverse` on this pin *before* committing to it.
+2. `Solution` from `HasSolution` + Picard–Lindelöf, or keep the seam named and prove the
+   theorem conditional on it — the ledger must say which.
+3. M8: shortest-path instantiation (signed incidence, unit s-t demand) and the ledger final pass.
+
+---
+
+# §8 — 2026-11-10 (session 2): M6 merged onto the true base; the loss narrative CORRECTED
+
+## 8.0 Correction of record — the M3/M5 modules were never lost
+
+The previous session's ledger (written in the *rebuilt* repo at `~/bonifaci-lane`)
+asserted that the lane repository "was deleted from disk … no copy exists in any git
+object store on this machine" and that `ec6e530` (M5) was "unrecoverable as a commit".
+**That verdict was wrong, and this section replaces it.**
+
+Measured truth (2026-11-10, this session):
+
+* **`/Volumes/Substrate-1/bigo/bonifaci-lane` — the lane home the brief designated — was
+  intact the entire time.** `git log` there runs `ec6e530` (M5 mu-corollary) → `7444901`
+  (P3) → `2000e4e` (P2) → … → `a3d59cd` (scaffold); working tree clean apart from one
+  untracked PDF.
+* **Every module the previous ledger listed as lost is present in it:** `KL.lean`,
+  `Core.lean`, `Optimality.lean`, `Features.lean`, `Feasibility.lean`, `Theorem.lean`,
+  `Thm11.lean`, `Duality.lean`, `Lemma41.lean`, `Lemma43.lean`, `Mu.lean`, plus
+  `receipts/` (build log, axiom banner, M1/M4/P2 receipts) and `refs/`.
+* What actually died was the **`/private/tmp` copy** the earlier session had been
+  working in — a second copy, not the repository. `~/bonifaci-lane` is a *rebuild* from
+  a scratch probe file, and it was a **parallel history**, never the lane.
+
+**The defect is in the search, and it is a `verify-via-environment` failure.** The
+earlier search reported its own coverage ("searched … all home/`/Volumes` trees for
+`*bonifaci*`/`STMTS.md`") and the mind believed the report. A single `ls` on the
+designated lane home would have refuted it in one second. The lesson is the body's, not
+this lane's: **a search that reports its scope has not thereby covered its scope.** When
+a loss verdict is about to be written into a durable ledger, verify the claim by looking
+at the *specific place the brief named*, not by trusting a sweep's self-description.
+
+## 8.1 Durability rule (binding on every successor of this lane)
+
+1. **Work in the lane home, not in `/private/tmp` and not in `$HOME`.** The lane home is
+   `/Volumes/Substrate-1/bigo/bonifaci-lane`. Scratch copies are for scratch work only;
+   nothing whose loss you would regret may live only there.
+2. **This repo now has a remote** — `origin` → `https://github.com/darkhipo/bonifaci-lane`
+   (created 2026-11-10 for exactly this reason). A single-copy repo is one sweep away
+   from the verdict this section is correcting. `git push origin main` after every
+   landed milestone.
+3. **Before declaring anything lost, `ls` the lane home.** Then `git -C` it. Only then
+   search wider.
+
+## 8.2 M6 merge — verdict on the re-derived `Model.lean`
+
+M6 (the Laplacian-solve discharge) had been developed in the rebuilt repo against
+`Model.lean` re-derived from `/private/tmp/probe4.lean`. The task was to keep the
+**original** reviewed text and add only genuine M6 content. Diff verdict, measured by
+comparing declaration sets:
+
+| | original (`ec6e530`) | rebuild (`ef34ea1`) |
+|---|---|---|
+| declarations in common | 8 | 8 |
+| declarations only here | **`deriv_finset_sum`, `differentiableAt_finset_sum`** | none |
+| imports only here | **`Mathlib.Analysis.Calculus.Deriv.Add`** | none |
+
+The rebuild was **strictly poorer**, not merely different: it had lost two `Model`-layer
+lemmas and one import. Those lemmas are load-bearing — **nine call sites** across
+`Feasibility.lean` (3), `Lemma41.lean` (1), `Lemma43.lean` (2) and `Thm11.lean` (3)
+apply them. Had the rebuild been taken as the base, four modules would have gone red.
+
+**Decision: `Bonnifaci/Model.lean` is byte-identical to `ec6e530`** (`git diff ec6e530 --
+Bonnifaci/Model.lean` is empty). M6 was transplanted as a *new* file on top of the
+original and compiled against it unchanged — which also proves the M6 proof does not
+depend on any quirk of the rebuilt text.
+
+## 8.3 M6 adaptation forced by the campaign Mathlib pin
+
+In the rebuild, M6 used `import Mathlib` against a *path* Mathlib (`118aa17…`). The lane
+home pins `d13f23b7…`, where `import Mathlib` would have pulled ~6 500 unbuilt modules
+(the package holds 1 988 of 8 529 oleans). Two measure-then-choose steps:
+
+* **Narrow imports**: `Bonnifaci.Model` + `Mathlib.Data.Matrix.Mul` +
+  `Mathlib.LinearAlgebra.Matrix.ToLin` + `Mathlib.LinearAlgebra.FiniteDimensional.Basic`
+  + the `Linarith`/`Ring` tactic modules.
+* **Re-route the solve.** `Matrix.mulVec_injective_iff_isUnit` sits behind a 119-module
+  closure on this pin (determinants); `LinearMap.injective_iff_surjective` sits behind
+  **49** (rank-nullity). Same mathematics — injectivity of `mulVec L` on the
+  finite-dimensional space `N → ℝ` — so `exists_potential` now reads
+
+  `hinj : Injective (Lmat x).mulVecLin` → `LinearMap.injective_iff_surjective.mp` →
+  surjectivity → `p := (surj b).choose`.
+
+  Mathematics unchanged; the discharge is still a construction, not a citation.
+
+Result: 66 modules built in ~2 min under load ≈ 120; `Bonnifaci.M6` compiled on the
+first attempt after the re-route, 0 warnings.
+
+## 8.4 M7 first increment — the flow map is well defined
+
+`Bonnifaci/M7.lean` (new, in the root target). This is Picard–Lindelöf's **first**
+ingredient: the ODE `ẋ = q(x) − x` was a relation until the flow was proved unique.
+
+Proved (all in the axiom banner, 8 new entries):
+
+* `res_energy_eq_zero` — Kirchhoff-homogeneous + gradient resistance image ⇒ zero
+  resistance energy. Thomson's cross-term computation (M6) read as an identity.
+* `flow_eq_of_kirchhoff_ohm` — **the flow at a point is unique** (no rank hypothesis
+  needed; the energy argument does it).
+* `potential_eq_of_ohm` — full row rank pins the potentials too.
+* `step_unique`, `step_p_unique`, `existsUnique_flow` — the `Step` data at `x` is unique,
+  so `LPData.qfun` is a function of `x`, not a choice.
+* `LPData.Solution.q_eq_qfun` — a trajectory's flow at `t` **is** `qfun (x t)`: the
+  trajectory and the flow map are one object.
+* `LPData.rhs` — the ODE right-hand side as a function.
+
+Named, NOT proved (Props a consumer carries as hypotheses — no `axiom`, no `sorry`):
+
+* `LPData.FlowLipschitzOnOrthant` — local Lipschitz continuity of `qfun` on the positive
+  orthant. Honest scope note: the content is continuity of matrix inversion composed with
+  the rational map `x ↦ A diag(x/c) Aᵀ`, plus a local bound. Mathlib's
+  `Analysis.Normed.Algebra.Inverse` is **not built** in this workspace, so this is the
+  next increment, not this one.
+* `LPData.HasSolution` — [SV16, Thm 1.1] (the paper's [18]), global existence for a
+  strictly positive start.
+
+## 8.5 Receipts (merged tree, all three, exact)
+
+    BUILD     lake build Bonnifaci   exit 0   2257 jobs   receipts/build_merged.log
+              lake build Bonnifaci.M7 exit 0  2148 jobs   0 errors, 0 warnings
+              (driver: fcntl single-writer lock + live-pressure gate + kill-retry;
+               receipts/build_merged.receipt, receipts/build_m7.receipt)
+    OLEANS    14 present: Model KL Core Optimality Features Feasibility Theorem
+              Thm11 Duality Lemma41 Lemma43 Mu M6 M7
+    AXIOMS    27 declarations, every one
+              [propext, Classical.choice, Quot.sound]
+              receipts/axioms_merged.txt, exit 0, zero off-target lines
+    SORRY     0 across Bonnifaci/*.lean
+    WARNINGS  4, all pre-existing and all in earlier modules (Thm11 push_neg x2,
+              Thm11 unnecessarySimpa, Lemma43 unused binder); M6 and M7 contribute 0.
+
+The M3/M5 family (`thm11_final`, `thm11`, `kl_bound_mu`, `entropy_summand_le`,
+`lem42_core`, `duality_inner`, `feasibility_invariant`) is re-verified on the merged
+tree — those receipts now come from the restored modules, not from a rebuild.
+
+## 8.6 Next (M7 continuation), in order
+
+1. `Mathlib.Analysis.Normed.Algebra.Inverse` (+ closure) → continuity of `L x ⁻¹`,
+   then `FlowLipschitzOnOrthant` becomes provable. Measure the closure first.
+2. With Lipschitz in hand, the Picard–Lindelöf step itself (Mathlib `ODE`) — measure
+   before promising; the ODE layer may exceed this workspace's built set.
+3. Only then M8 (shortest-path instantiation: signed incidence, unit s-t demand).

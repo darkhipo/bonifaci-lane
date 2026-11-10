@@ -1,0 +1,28 @@
+# attempt 1 target=Bonnifaci jobs=2 load1=121.9
+⚠ [2184/2257] Replayed Bonnifaci.Thm11
+warning: Bonnifaci/Thm11.lean:60:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:275:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:334:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [2187/2257] Replayed Bonnifaci.Lemma43
+warning: Bonnifaci/Lemma43.lean:87:5: Variable name `hxstar` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hxstar
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2256/2257] Built Bonnifaci (8.2s)
+Build completed successfully (2257 jobs).

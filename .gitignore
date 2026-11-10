@@ -3,3 +3,4 @@
 *.bak.created_at
 receipts/*.out
 receipts/swap-watch.log
+.lane-build.lock

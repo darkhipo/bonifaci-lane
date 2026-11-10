@@ -1,0 +1,8 @@
+MERGED TREE — three receipts (2026-11-10)
+BUILD   exit 0  2257 jobs  log=receipts/build_merged.log
+OLEANS  14 present (Model KL Core Optimality Features Feasibility Theorem Thm11 Duality Lemma41 Lemma43 Mu M6 M7)
+AXIOMS  27 declarations, all [propext, Classical.choice, Quot.sound]  file=receipts/axioms_merged.txt
+SORRY   0
+MODEL   git diff ec6e530 -- Bonnifaci/Model.lean : EMPTY (original preserved verbatim)
+M6      re-routed: Matrix.mulVecLin + LinearMap.injective_iff_surjective (49-module closure, vs 119 for isUnit)
+M7      Bonnifaci/M7.lean — flow well-defined; two seams named (FlowLipschitzOnOrthant, HasSolution)
