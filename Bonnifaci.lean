@@ -8,6 +8,7 @@ import Bonnifaci.Theorem
 import Bonnifaci.Thm11
 import Bonnifaci.Duality
 import Bonnifaci.Lemma41
+import Bonnifaci.Lemma43
 
 /- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 /-!

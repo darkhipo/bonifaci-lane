@@ -15,7 +15,7 @@ echo "$RC" > $REC/build.status
   echo "elapsed_s=$((T1-T0))"
   echo "gate=memory_pressure_free=67%_swapouts_delta=0 (R2125609494 replacement gate)"
   echo "lock=override_logged_in_swap-gate.log"
-  for m in Model KL Core Optimality Features Feasibility Theorem Thm11 Duality Lemma41; do
+  for m in Model KL Core Optimality Features Feasibility Theorem Thm11 Duality Lemma41 Lemma43; do
     O=$LANE/.lake/build/lib/lean/Bonnifaci/$m.olean
     if [ -f "$O" ]; then echo "olean[$m]=PRESENT $(stat -f%z "$O") bytes"; else echo "olean[$m]=MISSING"; fi
   done

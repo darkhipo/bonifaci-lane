@@ -1,6 +1,6 @@
-== receipt 2026-11-10T07:12:39Z ==
+== receipt 2026-11-10T07:20:32Z ==
 exit_code=0
-elapsed_s=16
+elapsed_s=22
 gate=memory_pressure_free>15%_swapouts_delta=0 (R2125609494)
 olean[Model]=PRESENT 351176 bytes
 olean[KL]=PRESENT 198680 bytes
@@ -12,4 +12,5 @@ olean[Theorem]=PRESENT 61896 bytes
 olean[Thm11]=PRESENT 723824 bytes
 olean[Duality]=PRESENT 219600 bytes
 olean[Lemma41]=PRESENT 258256 bytes
+olean[Lemma43]=PRESENT 252104 bytes
 axiom_banner_exit=0
