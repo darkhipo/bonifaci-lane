@@ -303,3 +303,8 @@ Axiom banner (`receipts/axioms.txt`), all twelve landed theorems:
 — no `sorryAx`, no lane axioms. Artefacts: `receipts/build.log`, `receipts/build.receipt`,
 `receipts/build.status`, `receipts/axioms.txt`, `refs/paper.txt` (primary-source text),
 `refs/bonifaci1611.06729.pdf`.
+
+**Fidelity note on the range of ε.** The paper says "for any ε > 0", but its
+proof substitutes ε' = ε/3 into Lemma 4.4, which requires ε' in (0, 1/2) — so the paper's
+argument is effective only for ε < 3/2, and the phrase "any ε > 0" is a mild overstatement in
+the source itself. `thm11_statement` carries ε <= 1, strictly inside the effective range.

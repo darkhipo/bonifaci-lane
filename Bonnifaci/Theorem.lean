@@ -95,6 +95,13 @@ initial condition, `ε > 0`), with the analytic steps P1–P3 carried as *named
 premises* rather than assumed silently. `Φ` is eq. (7); the bound
 `(6/ε)·Φ(0)` is the paper's, obtained from Theorem 4.7 with `ε' = ε/3`.
 
+Range note, stated honestly rather than glossed: the paper says «for any ε > 0», but its
+proof substitutes ε' = ε/3 into Lemma 4.4, which requires ε' ∈ (0, 1/2) — i.e. the paper's
+argument is effective only for ε < 3/2, and that phrase is a mild overstatement in the
+source. This statement carries ε ≤ 1, strictly inside the effective range, so nothing is
+lost; going past 3/2 needs a separate argument (the threshold Φ(0)/(ε/6) shrinks with ε
+while ε' would leave Lemma 4.4's domain).
+
 The reader of this definition can see every hypothesis the proof needs: nothing is
 hidden, and `Bonnifaci/Thm11.lean` proves this same shape from P1–P3. -/
 def thm11_statement : Prop :=
