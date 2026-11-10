@@ -57,7 +57,7 @@ Mapping paper → Lean (all finite: `N E : Type*` with `[Fintype]`, vectors as `
 | Prop 2.3 + Ohm (`x*ᵀRq = bᵀp`) | `xstar_Rq_eq` | Duality | **PROVED** (M3 core, drafted ahead) |
 | Lem 4.2 algebraic identity | `lem42_core` | Duality | **PROVED** (M3 core, drafted ahead) |
 | Lem 4.5 `ℰ ≤ cost` | `energy_le_cost` | Thm11 | **PROVED** (from Thomson) |
-| Lem 3.2 feasibility invariance | premise **P1** (`hfeas`) | Thm11 | premise |
+| Lem 3.2 feasibility invariance | premise **P1** (`hfeas`) → **`feasibility_invariant`** | Thm11 / Feasibility | premise, **discharged pending receipts** (`defect_ode` = Prop 3.1, `defect_decay`) |
 | Lem 4.1 d/dt bound | premise **P2** (`hcostlog`) | Thm11 | premise |
 | Lem 4.3 d/dt bound | premise **P3** (`hkl`) | Thm11 | premise |
 | Thm 4.7 + Thm 1.1 | `thm11` | Thm11 | **PROVED** mod P1–P3 |
@@ -119,8 +119,11 @@ widgets lane side when it lands.
   receipts** (blocked on fleet build queue at write time — host saturation 2026-11-09).
 * **M1** — build clean, `#print axioms thm11` receipt (expect only `propext`,
   `Classical.choice`, `Quot.sound`), three receipts per campaign convention.
-* **M2** — discharge **P1**: add `e(t)`-decay lemma (`Aẋ = b − Ax` algebra + `u' = 0`
-  comparison). Premise boundary: needs only `Solution` fields.
+* **M2** — ~~discharge P1~~ **DRAFTED** (`Bonnifaci/Feasibility.lean`:
+  `const_of_deriv_zero`, `defect_ode` (Prop 3.1), `defect_decay` (Lem 3.2),
+  `feasibility_invariant`); needs build receipts, then `thm11` consumers switch from
+  `hfeas` to the theorem (or `thm11` drops the P1 hypothesis in favor of
+  `hstart : IsFeasible (S.x 0)`).
 * **M3** — discharge **P3**: the duality sandwich `x*ᵀRq = bᵀp = ℰ` as a standalone
   proved lemma over `Solution`, then Lem 4.2 identity, then Lem 4.3 bound. Needs `q`
   continuous in `t` — extend `Solution` with `hcont : ∀ e, Continuous (fun t => q t e)`
