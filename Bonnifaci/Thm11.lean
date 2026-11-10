@@ -3,6 +3,7 @@ Copyright (c) 2026 MultiAgency bonifaci-lane.
 -/
 import Bonnifaci.Core
 import Bonnifaci.Features
+import Bonnifaci.Theorem
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
@@ -42,26 +43,12 @@ namespace Bonnifaci
 
 variable {N E : Type*} [Fintype N] [Fintype E]
 
-/-! ### Normalized cost distributions, energy, potential -/
+/-! ### Notation
 
-/-- `ξ*`: the optimal cost distribution over edges, `ξ*_e = c_e x*_e / opt`. -/
-def xiStar (d : LPData N E) (xstar : E → ℝ) (e : E) : ℝ :=
-  d.c e * xstar e / d.cost xstar
-
-/-- `ξ(t)`: the running cost distribution of the trajectory,
-`ξ_e(t) = c_e x_e(t) / cost(x(t))`. -/
-def xiAt (d : LPData N E) (S : d.Solution) (t : ℝ) (e : E) : ℝ :=
-  d.c e * S.x t e / d.cost (S.x t)
-
-/-- Energy `ℰ(t) = q(t)ᵀ R(t) q(t)` of the electrical flow. -/
-def energyAt (d : LPData N E) (S : d.Solution) (t : ℝ) : ℝ :=
-  ∑ e, d.c e / S.x t e * S.q t e ^ 2
-
-/-- The potential of eq. (7) of [Bonifaci 2016], in split form:
-`Φ(t) = 2·ln(cost(t)/opt) + Σ_e ξ*_e · ln(x*_e / x_e(t))`. -/
-def Phi (d : LPData N E) (S : d.Solution) (xstar : E → ℝ) (t : ℝ) : ℝ :=
-  2 * Real.log (d.cost (S.x t) / d.cost xstar)
-    + ∑ e, xiStar d xstar e * Real.log (xstar e / S.x t e)
+The notation xiStar, xiAt, energyAt and Phi lives in Bonnifaci/Theorem.lean (the
+machine-checked statement module), so the statement cannot drift while this proof
+is being repaired.
+-/
 
 /-! ### Positivity and normalization -/
 
@@ -79,7 +66,7 @@ theorem cost_pos (d : LPData N E) {x : E → ℝ} (hbnz : ∃ n, d.b n ≠ 0)
     (mul_eq_zero.1 (h3 e (Finset.mem_univ e))).resolve_left (ne_of_gt (d.hc e))
   refine hn ?_
   rw [← hx.2 n]
-  exact Finset.sum_congr rfl fun e _ => by rw [h4 e]; ring
+  exact Finset.sum_eq_zero fun e _ => by rw [h4 e, mul_zero]
 
 theorem sum_xiStar (d : LPData N E) (xstar : E → ℝ) (hbnz : ∃ n, d.b n ≠ 0)
     (hxstar : d.IsFeasible xstar) : ∑ e, xiStar d xstar e = 1 := by
@@ -88,7 +75,7 @@ theorem sum_xiStar (d : LPData N E) (xstar : E → ℝ) (hbnz : ∃ n, d.b n ≠
   have hterm : ∀ e, xiStar d xstar e = d.c e * xstar e * (d.cost xstar)⁻¹ := by
     intro e; rw [xiStar, div_eq_mul_inv]
   rw [Finset.sum_congr rfl fun e _ => hterm e, ← Finset.sum_mul,
-    show ∑ e, d.c e * xstar e = d.cost xstar from rfl, inv_mul_cancel₀ hoptpos.ne']
+    show ∑ e, d.c e * xstar e = d.cost xstar from rfl, mul_inv_cancel₀ hoptpos.ne']
 
 theorem sum_xiAt (d : LPData N E) (S : d.Solution) (hbnz : ∃ n, d.b n ≠ 0)
     (hfeas : ∀ t, d.IsFeasible (S.x t)) (t : ℝ) : ∑ e, xiAt d S t e = 1 := by
@@ -97,7 +84,7 @@ theorem sum_xiAt (d : LPData N E) (S : d.Solution) (hbnz : ∃ n, d.b n ≠ 0)
   have hterm : ∀ e, xiAt d S t e = d.c e * S.x t e * (d.cost (S.x t))⁻¹ := by
     intro e; rw [xiAt, div_eq_mul_inv]
   rw [Finset.sum_congr rfl fun e _ => hterm e, ← Finset.sum_mul,
-    show ∑ e, d.c e * S.x t e = d.cost (S.x t) from rfl, inv_mul_cancel₀ hcostpos.ne']
+    show ∑ e, d.c e * S.x t e = d.cost (S.x t) from rfl, mul_inv_cancel₀ hcostpos.ne']
 
 /-- Energy is nonnegative. -/
 theorem energy_nonneg (d : LPData N E) (S : d.Solution) (t : ℝ) : 0 ≤ energyAt d S t :=
@@ -136,6 +123,10 @@ theorem kl_split (d : LPData N E) (S : d.Solution) (xstar : E → ℝ)
         div_ne_zero (ne_of_gt hcostpos) (ne_of_gt hoptpos)
       have hxi : xiStar d xstar e / xiAt d S t e
           = (xstar e / S.x t e) * (d.cost (S.x t) / d.cost xstar) := by
+        have hc : d.c e ≠ 0 := ne_of_gt (d.hc e)
+        have hx0 : S.x t e ≠ 0 := ne_of_gt (S.hpos t e)
+        have ho : d.cost xstar ≠ 0 := ne_of_gt hoptpos
+        have ht0 : d.cost (S.x t) ≠ 0 := ne_of_gt hcostpos
         unfold xiStar xiAt
         field_simp
       rw [hxi, Real.log_mul hr1 hr2]
@@ -146,7 +137,12 @@ theorem kl_split (d : LPData N E) (S : d.Solution) (xstar : E → ℝ)
         Finset.sum_congr rfl fun e _ => term e
     _ = ∑ e, xiStar d xstar e * Real.log (xstar e / S.x t e)
           + Real.log (d.cost (S.x t) / d.cost xstar) * ∑ e, xiStar d xstar e := by
-        rw [Finset.sum_add_distrib, Finset.sum_mul]
+        have hterm : ∀ e, xiStar d xstar e * (Real.log (xstar e / S.x t e)
+              + Real.log (d.cost (S.x t) / d.cost xstar))
+            = xiStar d xstar e * Real.log (xstar e / S.x t e)
+              + Real.log (d.cost (S.x t) / d.cost xstar) * xiStar d xstar e := by
+          intro e; ring
+        rw [Finset.sum_congr rfl fun e _ => hterm e, Finset.sum_add_distrib, ← Finset.mul_sum]
     _ = _ := by rw [hsumstar]; ring
 
 /-- The potential in the paper's form, eq. (7). -/
@@ -169,7 +165,7 @@ theorem Phi_nonneg (d : LPData N E) (S : d.Solution) (xstar : E → ℝ)
   refine add_nonneg ?_ ?_
   · refine Real.log_nonneg ?_
     rw [one_le_div hoptpos]
-    exact hopt (hfeas t)
+    exact hopt (S.x t) (hfeas t)
   · refine KL_nonneg ?_ ?_ ?_ ?_
     · intro e; exact div_nonneg (mul_nonneg (d.hc e).le (hxstar.1 e)) hoptpos.le
     · intro e; exact div_pos (mul_pos (d.hc e) (S.hpos t e)) hcostpos
@@ -186,7 +182,7 @@ theorem differentiable_log_cost (d : LPData N E) (S : d.Solution) (xstar : E →
     Differentiable ℝ (fun u => Real.log (d.cost (S.x u) / d.cost xstar)) := by
   have hdiv : Differentiable ℝ (fun u => d.cost (S.x u) / d.cost xstar) :=
     (differentiable_cost d S).div (differentiable_const _)
-      fun u => ne_of_gt (cost_pos d hbnz (hfeas u))
+      fun _ => ne_of_gt (cost_pos d hbnz hxstar)
   exact hdiv.log fun u =>
     div_ne_zero (ne_of_gt (cost_pos d hbnz (hfeas u)))
       (ne_of_gt (cost_pos d hbnz hxstar))
@@ -202,20 +198,42 @@ theorem differentiable_kl (d : LPData N E) (S : d.Solution) (xstar : E → ℝ)
   rw [hfun]
   refine Differentiable.add ?_ (differentiable_log_cost d S xstar hxstar hbnz hfeas)
   intro u
-  exact DifferentiableAt.sum fun e _ =>
-    ((differentiable_const (xiStar d xstar e)).sub
-      ((S.hdiff u e).log (ne_of_gt (S.hpos u e)))).mul
-      (differentiable_const (xiStar d xstar e))
+  exact differentiableAt_finset_sum fun e => by
+    by_cases hxe : xstar e = 0
+    · -- the term is identically zero (x*_e = 0 makes xi*_e = 0), hence differentiable
+      have hzero : (fun v => xiStar d xstar e * Real.log (xstar e / S.x v e)) = fun _ => 0 := by
+        funext v
+        simp [xiStar, hxe]
+      rw [hzero]
+      exact differentiableAt_const 0
+    · have hxpos : 0 < xstar e := lt_of_le_of_ne (hxstar.1 e) (Ne.symm hxe)
+      have hq : DifferentiableAt ℝ (fun v => xstar e / S.x v e) u :=
+        (differentiableAt_const (xstar e)).div (S.hdiff u e) (ne_of_gt (S.hpos u e))
+      have hqne : xstar e / S.x u e ≠ 0 := div_ne_zero hxe (ne_of_gt (S.hpos u e))
+      exact (differentiableAt_const (xiStar d xstar e)).mul (hq.log hqne)
 
 theorem differentiable_Phi (d : LPData N E) (S : d.Solution) (xstar : E → ℝ)
     (hxstar : d.IsFeasible xstar) (hbnz : ∃ n, d.b n ≠ 0)
     (hfeas : ∀ t, d.IsFeasible (S.x t)) : Differentiable ℝ (Phi d S xstar) := by
-  refine ((differentiable_log_cost d S xstar hxstar hbnz hfeas).const_mul 2).add ?_
-  intro u
-  exact differentiableAt_finset_sum fun e =>
-    (differentiableAt_const (xiStar d xstar e)).mul
-      ((differentiableAt_const (xstar e)).sub
-        ((S.hdiff u e).log (ne_of_gt (S.hpos u e))))
+  have hfun : Phi d S xstar
+      = fun u => 2 * Real.log (d.cost (S.x u) / d.cost xstar)
+          + ∑ e, xiStar d xstar e * Real.log (xstar e / S.x u e) := rfl
+  rw [hfun]
+  refine Differentiable.add ?_ ?_
+  · exact (differentiable_log_cost d S xstar hxstar hbnz hfeas).const_mul 2
+  · intro u
+    exact differentiableAt_finset_sum fun e => by
+      by_cases hxe : xstar e = 0
+      · have hzero : (fun v => xiStar d xstar e * Real.log (xstar e / S.x v e)) = fun _ => 0 := by
+          funext v
+          simp [xiStar, hxe]
+        rw [hzero]
+        exact differentiableAt_const 0
+      · have hxpos : 0 < xstar e := lt_of_le_of_ne (hxstar.1 e) (Ne.symm hxe)
+        have hq : DifferentiableAt ℝ (fun v => xstar e / S.x v e) u :=
+          (differentiableAt_const (xstar e)).div (S.hdiff u e) (ne_of_gt (S.hpos u e))
+        have hqne : xstar e / S.x u e ≠ 0 := div_ne_zero hxe (ne_of_gt (S.hpos u e))
+        exact (differentiableAt_const (xiStar d xstar e)).mul (hq.log hqne)
 
 /-! ### Theorem 1.1 -/
 
@@ -268,17 +286,19 @@ theorem thm11
   have hcostanti : ∀ u ∈ Set.Icc 0 t, d.cost (S.x t) ≤ d.cost (S.x u) := by
     intro u hu
     have h1 := hloganti hu ⟨ht0, le_refl t⟩ hu.2
+    have h1' : Real.log (d.cost (S.x t) / d.cost xstar)
+        ≤ Real.log (d.cost (S.x u) / d.cost xstar) := h1
     have h2 : d.cost (S.x t) / d.cost xstar ≤ d.cost (S.x u) / d.cost xstar :=
-      (Real.log_le_log_iff (hcostpos u) (hcostpos t)).1 h1
+      (Real.log_le_log_iff (div_pos (hcostpos t) hoptpos) (div_pos (hcostpos u) hoptpos)).1 h1'
     rwa [div_le_div_iff_of_pos_right hoptpos] at h2
   -- while superoptimal, Φ' ≤ −ε/6
   have hPhi' : ∀ u ∈ Set.Ioo (0 : ℝ) t, deriv (Phi d S xstar) u ≤ -ε / 6 := by
     intro u hu
     have hsup : (1 + ε) * d.cost xstar ≤ d.cost (S.x u) :=
-      le_trans hcon (hcostanti (Set.mem_Icc.2 ⟨by linarith [hu.1], le_of_lt hu.2⟩))
+      le_trans hcon.le (hcostanti (u := u) (Set.mem_Icc.2 ⟨by linarith [hu.1], le_of_lt hu.2⟩))
     have hγ : 0 ≤ energyAt d S u / d.cost xstar := div_nonneg (hE0 u) hoptpos.le
     have hκ : ((1 : ℝ) + ε / 3) ^ 2 ≤ d.cost (S.x u) / d.cost xstar := by
-      rw [div_le_iff₀ hoptpos]
+      rw [le_div_iff₀ hoptpos]
       have h43 : ((1 : ℝ) + ε / 3) ^ 2 ≤ 1 + ε := by nlinarith
       calc ((1 : ℝ) + ε / 3) ^ 2 * d.cost xstar
           ≤ (1 + ε) * d.cost xstar := mul_le_mul_of_nonneg_right h43 hoptpos.le
@@ -292,7 +312,10 @@ theorem thm11
         + KL (xiStar d xstar) (xiAt d S v) :=
       funext fun v => Phi_eq_paper d S xstar hxstar hbnz hfeas v
     have hklD := differentiable_kl d S xstar hxstar hbnz hfeas
-    rw [hΦeq, deriv_add (hlogdiff u) (hklD u)]
+    have hfun : (fun v => Real.log (d.cost (S.x v) / d.cost xstar) + KL (xiStar d xstar) (xiAt d S v))
+        = (fun v => Real.log (d.cost (S.x v) / d.cost xstar))
+          + fun v => KL (xiStar d xstar) (xiAt d S v) := rfl
+    rw [hΦeq, hfun, deriv_add (hlogdiff u) (hklD u)]
     linarith [hcostlog u, hkl u, hcore]
   -- integrate: Φ(t) + (ε/6)t ≤ Φ(0)
   have hgdiff : Differentiable ℝ (fun u => Phi d S xstar u + (ε / 6) * u) := by
@@ -307,17 +330,31 @@ theorem thm11
       funext fun v => Phi_eq_paper d S xstar hxstar hbnz hfeas v
     have hklD := differentiable_kl d S xstar hxstar hbnz hfeas
     have hdg : deriv (fun v : ℝ => (ε / 6) * v) u = ε / 6 := by
-      have hdm := deriv_const_mul (ε / 6) differentiableAt_id
+      have hdm := deriv_const_mul (ε / 6) (x := u) differentiableAt_id
       simpa using hdm
-    rw [hΦeq, deriv_add (hlogdiff u) (hklD u), hdg]
+    have hsum : deriv (fun v => Phi d S xstar v) u
+        = deriv (fun v => Real.log (d.cost (S.x v) / d.cost xstar)) u
+          + deriv (fun v => KL (xiStar d xstar) (xiAt d S v)) u := by
+      have hfun : (fun v => Real.log (d.cost (S.x v) / d.cost xstar) + KL (xiStar d xstar) (xiAt d S v))
+          = (fun v => Real.log (d.cost (S.x v) / d.cost xstar))
+            + fun v => KL (xiStar d xstar) (xiAt d S v) := rfl
+      rw [hΦeq, hfun, deriv_add (hlogdiff u) (hklD u)]
+    show deriv ((fun v => Phi d S xstar v) + fun v => (ε / 6) * v) u ≤ 0
+    have hPhid : DifferentiableAt ℝ (fun v => Phi d S xstar v) u :=
+      differentiable_Phi d S xstar hxstar hbnz hfeas u
+    have hεd : DifferentiableAt ℝ (fun v : ℝ => (ε / 6) * v) u :=
+      (differentiableAt_const (ε / 6)).mul differentiableAt_id
+    rw [deriv_add hPhid hεd, hsum, hdg]
     linarith [hPhi' u hu, hcostlog u, hkl u]
   have hgtle : Phi d S xstar t + (ε / 6) * t ≤ Phi d S xstar 0 := by
-    have := hg 0 ⟨ht0, le_refl 0⟩ ⟨ht0, le_refl t⟩ ht0
-    rwa [mul_zero] at this
+    have := hg (a := 0) (b := t) ⟨le_refl 0, ht0⟩ ⟨ht0, le_refl t⟩ ht0
+    simpa using this
   -- Φ(t) ≤ 0 and ≥ 0, so Φ(t) = 0, so the log part vanishes, so cost = opt
   have ht6 : Phi d S xstar 0 ≤ (ε : ℝ) / 6 * t := by
     have h2 : 0 < (6 : ℝ) / ε := div_pos (by norm_num) hε0
-    nlinarith [h2, hΦ0, ht]
+    have h4 : Phi d S xstar 0 ≤ t / ((6 : ℝ) / ε) := (le_div_iff₀ h2).2 (by linarith [ht])
+    have h3 : t / ((6 : ℝ) / ε) = (ε / 6) * t := by field_simp
+    linarith [h4, h3]
   have hPhit : Phi d S xstar t ≤ 0 := by linarith
   have hPhit0 : 0 ≤ Phi d S xstar t := Phi_nonneg d S xstar hxstar hbnz hfeas hopt t
   have hPhitz : Phi d S xstar t = 0 := le_antisymm hPhit hPhit0
@@ -331,7 +368,7 @@ theorem thm11
       · exact sum_xiStar d xstar hbnz hxstar
       · exact sum_xiAt d S hbnz hfeas t
     have hlognonneg : 0 ≤ Real.log (d.cost (S.x t) / d.cost xstar) :=
-      Real.log_nonneg (div_nonneg (le_trans (hopt (hfeas t)) le_rfl) hoptpos.le)
+      Real.log_nonneg (by rw [one_le_div hoptpos]; exact hopt (S.x t) (hfeas t))
     linarith
   have hcosteq : d.cost (S.x t) = d.cost xstar := by
     rcases Real.log_eq_zero.1 hlogz with h0 | h1 | hneg
@@ -340,7 +377,7 @@ theorem thm11
         field_simp
       rw [h2, h1, mul_one]
     · exact absurd (div_pos (hcostpos t) hoptpos) (by rw [hneg]; linarith)
-  rw [hcosteq]
-  exact le_mul_of_one_le_right hoptpos.le (by linarith)
+  rw [hcosteq] at hcon
+  nlinarith [hcon, hε0, hoptpos]
 
 end Bonnifaci

@@ -1,4 +1,21 @@
-✔ [2177/2179] Built Bonnifaci.Theorem (10s)
-✔ [2178/2179] Built Bonnifaci (3.4s)
-Build completed successfully (2179 jobs).
+⚠ [2184/2187] Replayed Bonnifaci.Thm11
+warning: Bonnifaci/Thm11.lean:60:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:275:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:334:6: try 'simp' instead of 'simpa'
 
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2185/2187] Built Bonnifaci.Duality (9.1s)
+✔ [2186/2187] Built Bonnifaci (5.2s)
+Build completed successfully (2187 jobs).

@@ -1,4 +1,4 @@
-== receipt 2026-11-10T05:57:37Z ==
+== receipt 2026-11-10T07:04:21Z ==
 exit_code=0
 elapsed_s=17
 gate=memory_pressure_free=67%_swapouts_delta=0 (R2125609494 replacement gate)
@@ -10,5 +10,6 @@ olean[Optimality]=PRESENT 83064 bytes
 olean[Features]=PRESENT 113696 bytes
 olean[Feasibility]=PRESENT 167104 bytes
 olean[Theorem]=PRESENT 61896 bytes
-axiom_banner_exit=0
+olean[Thm11]=PRESENT 723824 bytes
+olean[Duality]=PRESENT 219600 bytes
 axiom_banner_exit=0

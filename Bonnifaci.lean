@@ -5,6 +5,8 @@ import Bonnifaci.Optimality
 import Bonnifaci.Features
 import Bonnifaci.Feasibility
 import Bonnifaci.Theorem
+import Bonnifaci.Thm11
+import Bonnifaci.Duality
 
 /- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 /-!
