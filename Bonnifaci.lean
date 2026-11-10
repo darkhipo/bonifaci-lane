@@ -13,6 +13,7 @@ import Bonnifaci.Mu
 import Bonnifaci.M6
 import Bonnifaci.M7
 import Bonnifaci.M8
+import Bonnifaci.ShortestPath
 
 /- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 /-!
@@ -43,9 +44,13 @@ Primary source, verified against the full text on 2026-11-10 (STMTS.md §0):
   M6           the Laplacian-solve seam DISCHARGED (exists_step from posDef L = A C A^T)
   M7           the flow map is well defined (existsUnique_flow, qfun, q_eq_qfun)
   M8           FlowLipschitzOnOrthant DISCHARGED (energy perturbation estimate)
+  ShortestPath the network case of §2.2: signed incidence, unit s-t demand, and the
+               shortest-path identification corollary (at a rest point the Kirchhoff
+               potentials are a shortest-path distance function)
 
-All fifteen modules above are green inside this target. Two named Props survive, both
-deliberate and both documented in STMTS.md §9:
+All sixteen modules above are green inside this target. One named Prop survives,
+deliberate and documented in STMTS.md §9.3 (the earlier "two" was the pre-M8 count —
+`FlowLipschitzOnOrthant` became a theorem in M8):
 
   `LPData.HasSolution`      — global existence of the trajectory (SV16, the paper's [18]).
                               Kept named: the ODE library it would need closes over 6616

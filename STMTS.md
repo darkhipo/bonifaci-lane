@@ -708,3 +708,127 @@ No consumer of `thm11` reads `HasSolution`, so nothing downstream is blocked by 
    in §9.3.
 3. If a successor wants a *sharp* Lipschitz constant, `W/μ` in §9.2 is the object to tighten;
    the estimate itself (`energy_perturb`) is the reusable part.
+
+## 9.6 M8b — the shortest-path instantiation (§2.2), landed (§9.5 item 1 is now done)
+
+The last cheap milestone named in §9.5, executed as instructed: a bounded spike on the
+incidence plumbing **first**, then the paper's own §2.2 example closed rather than deferred.
+New file: `Bonnifaci/ShortestPath.lean` (19626 bytes, 24 declarations: 1 structure,
+6 definitions, 17 theorems). Root target grew from 2258 to 2259 jobs; **16 oleans**.
+
+### 9.6.1 The spike, measured (not estimated)
+
+| candidate module | `closure_cost.py` says | what it actually cost |
+|---|---|---|
+| `Mathlib.Data.Fintype.Basic` (for a grounded subtype `{v // v ≠ ground}`) | 2 UNBUILT | not taken — see below |
+| `Mathlib.Algebra.BigOperators.Group.Finset.Piecewise` (`sum_ite_eq`) | 2 UNBUILT | **0** — already inside `Model`'s closure |
+| `Mathlib.Data.Fin.VecNotation` (`![…]` for the concrete instance) | 2 UNBUILT | **0** — already inside `Model`'s closure |
+
+**Correction to how §9.1's table should be read.** *Every* candidate reports exactly `2` UNBUILT
+— including `Mathlib.Algebra.Order.BigOperators.Ring.Finset`, which `Bonnifaci.Model` has imported
+since M1 and which the target already builds against. The two are `Batteries.Classes.Cast` and
+`Mathlib.Data.Sym.Sym2.Init`: sources present in the package tree, oleans absent from *every*
+`.lake/build/lib/lean`, build green regardless. So in this tree the number carries a **constant
+offset of 2**, and it is the *difference* between candidates that carries signal. §9.1's
+72 / 190 / 6616 findings remain sound because each was a difference against this same baseline;
+their absolute values should not be read as literal compile counts, and none of them should be
+quoted again without this offset stated. (Cause of the offset not investigated — its effect on
+this milestone's decision is nil, because the decision was made on differences and every
+difference relevant here was 0.)
+
+**The route cost, measured by the build itself: 0 new imports, 1 new module, 10–11 s.**
+`Bonnifaci/ShortestPath.lean` imports only `Bonnifaci.Model` and `Bonnifaci.Optimality`.
+
+Two spike findings that changed the design:
+
+1. **A `def` whose declared parameter is unused loses that parameter.** `unitDemand` was written
+   inside `namespace Network` under `variable (G : Network V E)`. Because `G` occurs in neither
+   the type nor the body, Lean drops it, and `G.unitDemand s t` then fails with *"Invalid field
+   notation: Function `unitDemand` does not have a usable parameter of type `Network`"*. It now
+   lives in the root namespace, and the theorems that do not mention `G` are stated without it.
+2. **`toLPData`'s fields are definitionally but not syntactically reduced.** `(G.toLPData s t).c`
+   and `G.len` are the same term — `rfl` proves them equal — but `rw` will not cross them. The two
+   proofs that must rewrite carry an explicit `simp only [toLPData]`.
+3. **A trap avoided by measurement, not luck:** the `Step` and `IsFixedPoint` hypotheses are
+   *not* needed for the concrete instance. `isShortestPathLength_of_tight` only wants a feasible
+   flow, a dual-feasible potential, and tightness on the flow's support — so `path3_shortestPath`
+   never constructs a `Step`, and therefore never has to discharge Thomson's principle at a
+   concrete graph. That would have been the expensive part of the example, and it is not needed.
+
+### 9.6.2 Grounding, proved rather than quoted
+
+§2.2's footnote 1 drops one node's row from `A` "since we stipulated that A should be full rank".
+Both halves of that licence are now theorems:
+
+* `Network.feasible_sum_b_eq_zero` — any realisable demand balances, `∑_v b_v = 0`. Hence the
+  `|V|` node equations are *never* independent: the incidence matrix has `1⃗` in its left kernel.
+* `Network.groundRow_implied` — and this is *which* row may go: fix a ground node `g`; if a vector
+  satisfies the equations at every node except `g`, and the demand balances, then the equation at
+  `g` holds too. So dropping the ground row loses nothing.
+
+**Not proved, stated as the remaining hypothesis rather than hidden:** that the *reduced* matrix
+has full row rank — i.e. that the graph is connected once the ground node is removed. It is
+consumed only by the Laplacian-solve layer (`FullRowRank`, M6/M7). Nothing in `ShortestPath.lean`
+needs it: every identity and the whole duality argument are rank-free. Grounding is used here for
+its *other* job — fixing the potential gauge — and that is what turns the difference `p t − p s`
+into `p t` itself in `distance_from_grounded_source`.
+
+### 9.6.3 The identification corollary
+
+`Network.IsShortestPathLength s t L` is the §2.2 LP's optimality predicate: some nonnegative flow
+satisfying the unit `s`–`t` demand costs `L`, and no such flow costs less. (Stated as a predicate
+rather than via `sInf`, so no completeness of `ℝ` is invoked.) The chain:
+
+| declaration | content |
+|---|---|
+| `Network.A_mul_potential` | the one structural identity: `∑_v A v e · P v = P(head e) − P(tail e)` |
+| `Network.potential_inner_eq_edge_sum` | for any flow `x` realising `b`: `∑_v P v · b v = ∑_e x_e (P(head e) − P(tail e))` |
+| `Network.demand_inner` | for the unit `s`–`t` demand that left side is `P t − P s`, the dual objective |
+| `Network.dual_feasible_le_cost` | **weak duality**: a dual-feasible `P` lower-bounds every feasible flow's cost |
+| `Network.dual_feasible_bound` | hence `P t − P s ≤ L`: every feasible potential *underestimates* the distance |
+| `Network.cost_eq_potential_diff_of_tight` | tightness on the support atones for every inequality |
+| `Network.isShortestPathLength_of_tight` | **complementary slackness**: tight-on-support certifies the flow shortest and `P t − P s` as the value |
+| `Network.fixed_point_potentials_tight` | at a rest point Ohm's law makes `p` tight on **every** edge |
+| `Network.fixed_point_potentials_are_distances` | **the corollary**: at a rest point, `p t − p s` **is** the shortest-path value |
+| `Network.distance_from_grounded_source` | with `p ground = 0`, the potential `p t` **is** the distance from the grounded source |
+| `path3_shortestPath` | **concrete**: on the path graph `0→1→2` with lengths `a`,`b`, the value is `a + b`, witnessed by the distance function `(0, a, a+b)` |
+
+**Honest scope — the same one `Optimality.lean` makes, now in the network case.** A rest point
+forces `p(head e) − p(tail e) = len e` on *every* edge at once, so in the interior a rest point
+exists only when the lengths are conservative: on a graph with a positive-length cycle it does not
+exist. The non-degenerate content is therefore the pair
+`isShortestPathLength_of_tight` + `dual_feasible_bound` (no rest point, no convergence, no
+existence assumed), which together say the shortest-path value is the **maximum** of `P t − P s`
+over dual-feasible potentials; the rest-point theorems say which potentials realise the maximum.
+Convergence *to* that optimum with thinning support remains Theorem 1.1's job, unchanged.
+`path3` is a tree — deliberately — which is exactly why its lengths are conservative and an
+interior rest point does exist there.
+
+### 9.6.4 Receipts (three, exact, this tree)
+
+    BUILD     lake build Bonnifaci          exit 0   2259 jobs   receipts/build_m8b.receipt
+              lake env lean Bonnifaci/ShortestPath.lean   0 errors, 0 warnings
+              (driver: receipts/build_lock.py fcntl single-writer on
+               /Volumes/Substrate-1/bigo/.build.lock; live-pressure gate GO:
+               free 71-73%, swap NOT growing 16023.75M -> 16166.62M while the lock was held)
+    OLEANS    16 present: Model KL Core Optimality Features Feasibility Theorem Thm11
+              Duality Lemma41 Lemma43 Mu M6 M7 M8 **ShortestPath**
+    AXIOMS    receipts/axioms_m8b.txt — all 17 new theorems:
+              depends on axioms: [propext, Classical.choice, Quot.sound]
+              zero `sorry`, zero `axiom` commands anywhere in Bonnifaci/*.lean
+              (the only two `sorry` strings in the tree are prose in M7/Thm11 docstrings)
+    WARNINGS  0 contributed by ShortestPath; the 4 pre-existing (Thm11 ×3, Lemma43 ×1) unchanged
+
+### 9.6.5 Next
+
+1. **`HasSolution`** remains the one named seam that is a real open problem, and §9.3's measurement
+   stands: 6616 modules of ODE library (now with the §9.6.1 offset caveat), plus global two-sided
+   existence. Nothing in M8b moves it, and nothing in M8b wanted it.
+2. **A connectedness → `FullRowRank` bridge** is the one hypothesis M8b used but did not prove
+   (§9.6.2). It is a reachability induction over `Finset`, and it would make the `toLPData`
+   instance consumable by M6/M7's `exists_step` — i.e. it is what a successor needs to put a
+   *network* through the Laplacian layer. Cheap in principle; not attempted here.
+3. **A positive-length-cycle instance** would make the §9.6.3 scope note machine-checkable: no
+   dual-feasible tight potential exists on the triangle. Stated as non-existence, so it needs the
+   negation of the dual-feasibility system at a concrete graph — a bounded next increment.
+4. `W/μ` tightening (§9.2/§9.5 item 3) is unchanged and still available.

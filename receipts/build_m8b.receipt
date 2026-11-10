@@ -1,0 +1,28 @@
+BUILD RECEIPT — M8b (the shortest-path instantiation, §2.2 network case)
+base commit : 75c7e1e (+ M8b working tree)
+date        : 2026-11-10T09:59:48Z
+lock        : receipts/build_lock.py fcntl single-writer on /Volumes/Substrate-1/bigo/.build.lock
+gate        : free 71-73%, swap NOT growing (16023.75M -> 16166.62M across the lock window)
+command     : lake build Bonnifaci
+
+RESULT      : exit 0, 2259 jobs (was 2258 before M8b), Build completed successfully
+NEW MODULES : 1  (Bonnifaci.ShortestPath — built in 10s). 0 new Mathlib imports.
+WARNINGS    : 4, all pre-existing (Thm11 x3 push_neg/simpa; Lemma43 x1 unused var);
+              ShortestPath contributes 0  (lake env lean Bonnifaci/ShortestPath.lean: clean)
+ERRORS      : 0
+
+--- lake build Bonnifaci (tail) ---
+✔ [2257/2259] Built Bonnifaci.ShortestPath (10s)
+✔ [2258/2259] Built Bonnifaci (2.5s)
+Build completed successfully (2259 jobs).
+[build_lock] RELEASE rc=0 elapsed=20s
+
+--- closure measurement (receipts/closure_cost.py, pre-spike) ---
+  candidate                                            reported UNBUILT
+  Mathlib.Data.Fintype.Basic                                    2
+  Mathlib.Algebra.BigOperators.Group.Finset.Piecewise           2
+  Mathlib.Data.Fin.VecNotation                                  2
+  Mathlib.Algebra.Order.BigOperators.Ring.Finset                2   <-- already imported by Model
+  Constant offset of 2 in this tree (Batteries.Classes.Cast, Mathlib.Data.Sym.Sym2.Init:
+  sources present, oleans absent, build green). Differences carry the signal; the
+  absolute number does not. All differences relevant to M8b were 0.

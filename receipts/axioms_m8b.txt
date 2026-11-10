@@ -1,0 +1,33 @@
+[build_lock] ACQUIRED /Volumes/Substrate-1/bigo/.build.lock (waited 0s); cmd=lake env lean receipts/receipt_axioms_m8b.lean
+'Bonnifaci.sum_unitDemand' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.demand_inner' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.A_mul_potential' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.sum_A' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.toLPData_cost' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.toLPData_feasible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.feasible_sum_b_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.groundRow_implied' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.potential_inner_eq_edge_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.dual_feasible_le_cost' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.cost_eq_potential_diff_of_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.dual_feasible_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.isShortestPathLength_of_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.fixed_point_potentials_tight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.fixed_point_potentials_are_distances' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.distance_from_grounded_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.path3_shortestPath' depends on axioms: [propext, Classical.choice, Quot.sound]
+@Bonnifaci.Network.fixed_point_potentials_are_distances : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V]
+  [inst_1 : Fintype E] [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) {s t : V} {x : E → ℝ},
+  (∀ (e : E), 0 < x e) →
+    ∀ (st : (G.toLPData s t).Step x), (G.toLPData s t).IsFixedPoint x st → G.IsShortestPathLength s t (st.p t - st.p s)
+@Bonnifaci.Network.distance_from_grounded_source : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V]
+  [inst_1 : Fintype E] [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) {ground t : V} {x : E → ℝ},
+  (∀ (e : E), 0 < x e) →
+    ∀ (st : (G.toLPData ground t).Step x),
+      (G.toLPData ground t).IsFixedPoint x st → st.p ground = 0 → G.IsShortestPathLength ground t (st.p t)
+Bonnifaci.path3_shortestPath : ∀ (a b : ℝ) (ha : 0 < a) (hb : 0 < b),
+  (Bonnifaci.path3 a b ha hb).IsShortestPathLength 0 2 (a + b)
+@Bonnifaci.Network.dual_feasible_bound : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V] [inst_1 : Fintype E]
+  [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) {s t : V} {L : ℝ},
+  G.IsShortestPathLength s t L → ∀ (P : V → ℝ), (∀ (e : E), P (G.head e) - P (G.tail e) ≤ G.len e) → P t - P s ≤ L
+[build_lock] RELEASE rc=0 elapsed=15s
