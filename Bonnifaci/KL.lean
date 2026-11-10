@@ -3,6 +3,8 @@ Copyright (c) 2026 MultiAgency bonifaci-lane.
 -/
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
+noncomputable section
+
 /-!
 # Kullback–Leibler divergence for finite support
 

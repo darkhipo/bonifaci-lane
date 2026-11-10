@@ -1,0 +1,13 @@
+== receipt 2026-11-10T05:54:36Z ==
+exit_code=0
+elapsed_s=26
+gate=memory_pressure_free=67%_swapouts_delta=0 (R2125609494 replacement gate)
+lock=override_logged_in_swap-gate.log
+olean[Model]=PRESENT 351176 bytes
+olean[KL]=PRESENT 198680 bytes
+olean[Core]=PRESENT 303296 bytes
+olean[Optimality]=PRESENT 83064 bytes
+olean[Features]=PRESENT 113696 bytes
+olean[Feasibility]=PRESENT 167104 bytes
+olean[Theorem]=PRESENT 61392 bytes
+axiom_banner_exit=0

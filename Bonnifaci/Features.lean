@@ -1,8 +1,9 @@
-/-
-Copyright (c) 2026 MultiAgency bonifaci-lane.
--/
+/- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 import Bonnifaci.Model
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
+import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+
+noncomputable section
 
 /-!
 # Structural features of the Physarum trajectory
@@ -27,6 +28,8 @@ open Set
 
 namespace Bonnifaci
 
+variable {N E : Type*} [Fintype N] [Fintype E]
+
 /-- **Edges never retire.** If the electrical flow is nonnegative along the trajectory
 (network case), then `x_e(0) · e^{-t} ≤ x_e(t)` for all `t ≥ 0`. -/
 theorem edge_no_retirement (d : LPData N E) (S : d.Solution) (e : E)
@@ -36,17 +39,23 @@ theorem edge_no_retirement (d : LPData N E) (S : d.Solution) (e : E)
   have hdiff : Differentiable ℝ f := hxdiff.mul Real.differentiable_exp
   have hder : ∀ u, 0 ≤ deriv f u := by
     intro u
-    rw [hf, deriv_mul (S.hdiff u e) (Real.differentiable_exp u), S.hode u e, Real.deriv_exp]
+    have h1 : deriv f u = (S.q u e - S.x u e) * Real.exp u + S.x u e * Real.exp u := by
+      have hfun : (fun u : ℝ => S.x u e * Real.exp u) = (fun u => S.x u e) * Real.exp := rfl
+      rw [hf, hfun, deriv_mul (S.hdiff u e) (Real.differentiable_exp u), S.hode u e, Real.deriv_exp]
+    rw [h1]
     have hu : 0 < Real.exp u := Real.exp_pos u
     nlinarith [hq u, hu]
   have hmono : MonotoneOn f univ :=
     monotoneOn_of_deriv_nonneg convex_univ hdiff.continuous.continuousOn
       (by rw [interior_univ]; exact hdiff.differentiableOn) fun u _ => hder u
-  have h1 := hmono 0 t (mem_univ 0) (mem_univ t) ht
-  rw [Real.exp_zero] at h1
-  have h2 : S.x 0 e * Real.exp (-t) ≤ S.x t e * Real.exp t * Real.exp (-t) :=
-    mul_le_mul_of_nonneg_right h1 (Real.exp_nonneg (-t))
-  rw [← Real.exp_add, Real.add_neg_cancel, Real.exp_zero, mul_one] at h2
-  exact h2
+  have h1 : f 0 ≤ f t := hmono (Set.mem_univ 0) (Set.mem_univ t) ht
+  calc S.x 0 e * Real.exp (-t)
+      = f 0 * Real.exp (-t) := by rw [hf]; simp
+    _ ≤ f t * Real.exp (-t) := mul_le_mul_of_nonneg_right h1 (Real.exp_nonneg (-t))
+    _ = S.x t e := by
+        have hfun : (fun u : ℝ => S.x u e * Real.exp u) = (fun u => S.x u e) * Real.exp := rfl
+        rw [hf, hfun]
+        show S.x t e * Real.exp t * Real.exp (-t) = S.x t e
+        rw [mul_assoc, ← Real.exp_add, add_neg_cancel, Real.exp_zero, mul_one]
 
 end Bonnifaci

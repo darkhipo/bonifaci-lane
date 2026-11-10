@@ -1,0 +1,5 @@
+.lake/
+*.bak
+*.bak.created_at
+receipts/*.out
+receipts/swap-watch.log

@@ -1,0 +1,688 @@
+                                                     ON THE CONVERGENCE TIME OF A NATURAL DYNAMICS
+                                                                FOR LINEAR PROGRAMMING
+
+
+                                                                                        VINCENZO BONIFACI∗
+
+
+                                                    Abstract. We consider a system of nonlinear ordinary differential equations for the solution of
+                                                    linear programming (LP) problems that was first proposed in the mathematical biology literature
+                                                    as a model for the foraging behavior of acellular slime mold Physarum polycephalum, and more
+
+
+
+
+arXiv:1611.06729v1 [math.OC] 21 Nov 2016
+                                                    recently considered as a method to solve LPs. We study the convergence time of the continuous
+                                                    Physarum dynamics in the context of the linear programming problem, and derive a new time
+                                                    bound to approximate optimality that depends on the relative entropy between projected versions
+                                                    of the optimal point and of the initial point. The bound scales logarithmically with the LP cost
+                                                    coefficients and linearly with the inverse of the relative accuracy, establishing the efficiency of
+                                                    the dynamics for arbitrary LP instances with positive costs.
+
+
+
+
+                                                                                              Contents
+                                              1. Introduction                                                                                              2
+                                              1.1. Linear programming and the Physarum dynamics                                                            2
+                                              1.2. Our contribution                                                                                        3
+                                              1.3. Related work                                                                                            4
+                                              1.4. Organization of the paper                                                                               5
+                                              2. Basic properties of the dynamics                                                                          5
+                                              2.1. Notation                                                                                                5
+                                              2.2. Intuition: The network case                                                                             5
+                                              2.3. Basic properties of the dynamics                                                                        6
+                                              3. Convergence to the feasible region                                                                        6
+                                              4. Convergence in cost value                                                                                 7
+                                              5. Physarum dynamics for the unit simplex                                                                   10
+                                              References                                                                                                  11
+
+
+
+
+                                              Keywords: linear programming, natural algorithm, Physarum dynamics, relative entropy, Mir-
+                                           ror Descent
+                                              ∗ Vincenzo Bonifaci, Institute for the Analysis of Systems and Informatics, National Research Council of Italy
+
+                                           (IASI-CNR), Rome, Italy.
+                                                                                                    1
+                                         1. Introduction
+    The theoretical analysis of natural systems has historically been the domain of mathemati-
+cal biology, dynamical systems theory, and physics, but certain natural processes are capable of
+exhibiting remarkable information processing abilities which are often best understood from an
+optimization perspective. Indeed, the application of a “computational lens” to such processes has
+been advocated in different disciplines, and efforts are underway to identify, classify and analyze
+these so-called natural algorithms [14, 9].
+    One such example can be found in the slime mold Physarum polycephalum. P. polycephalum is
+an acellular, amoeboid slime mold in the Mycetozoa group. In controlled experiments, the slime
+mold’s capabilities have been leveraged to determine the shortest path between two locations in
+a network [13, 19] and, more generally, to adaptively form efficient transport networks [21]. In
+fact, a dynamical model proposed by the mathematical biologists to describe the time evolution
+of P. polycephalum’s network physiology [20] has been rigorously proved to be algorithmically
+efficient for problems such as the single-source single-sink shortest path problem [8, 4] and the
+minimum-cost transshipment problem [10, 17].
+    More recently, a variant of what we will call for short the Physarum dynamics has been pro-
+posed for solving linear programming (LP) problems [11]. Such dynamics is a direct mathematical
+extension of the one that has been studied for the shortest path and transshipment problems. It
+was shown that, under very mild assumptions on the linear program, the dynamics converges to
+an optimal LP solution [18]. However, the bound for the time of convergence of a discretization
+of the dynamics to an approximate solution has only been proved to be polynomial when the
+LP cost coefficients are polynomially bounded and the constraint matrix has bounded maximum
+subdeterminant.
+    The contribution of this paper is to study the convergence time of the continuous Physarum
+dynamics in the context of the linear programming problem, and to derive a new time bound to
+approximate optimality that does not depend on the maximum subdeterminant of the constraint
+matrix, and depends only logarithmically on the LP costs, establishing efficiency for any LP in-
+stance with positive costs. The proof is based on convex duality and on a dimensionless potential
+function that involves the relative entropy between the optimal and the current LP solution. We
+leave the study of a discretized version of the dynamics for future work, but it is natural to conjec-
+ture that some appropriate discretization should behave similarly to the continuous time dynamics.
+Indeed, several convex optimization methods can be interpreted as the discretization of an ordi-
+nary differential equation system, the solutions of which are guaranteed to converge to the set of
+minimizers; a well-known example is the interior point method [12, 3].
+    There is another compelling reason to study the convergence properties of the Physarum dy-
+namics. It has been showed that, at least when started from a feasible point, this dynamics can
+be interpreted as a natural gradient descent algorithm in a space endowed with a non-Euclidean
+metric obtained from an entropy-like function [18]. This is also the case for certain incarnations of
+well-known meta-algorithms, such as Mirror Descent [15, 5], which are at the basis of very effective
+approximation algorithms for machine learning and convex optimization problems [2]. We build
+on the intuition from Straszak and Vishnoi [18] by showing that, when the feasible LP region is
+the unit simplex, but independently of whether the initial point is feasible or not, the Physarum
+dynamics is identical to the continuous Mirror Descent dynamics of Nemirovski and Yudin [15] in
+the metric generated by the negative entropy function. Thus, when the feasible LP region is the
+simplex, the dynamics can be interpreted as a Mirror Descent method in information geometry
+[1]. However, a similar connection may not hold for a more general feasible region. A full char-
+acterization of the meta-algorithm behind the dynamics remains open; we believe it deserves to
+be investigated, due to its potential to suggest a novel iterative approach to linear optimization
+problems.
+
+1.1. Linear programming and the Physarum dynamics. Let N and E be two finite index
+sets. Given a real matrix A ∈ RN ×E , a positive vector c ∈ RE                      N
+                                                             >0 , and a vector b ∈ R , we consider
+the linear programming problem
+(1)                                      min cost(x)
+                                                  2
+                                            s.t. Ax = b
+                                                 x ≥ 0, x ∈ RE
+                  def
+where cost(x) = c⊤ x. We assume that A has full rank and that a nonzero optimal solution to
+(1) exists; uniqueness is not required. We denote by x∗ an arbitrary optimal solution to (1), and
+               def
+denote by opt = cost(x∗ ) its value.
+   We describe the (directed) Physarum dynamics [20, 10, 8, 7, 4, 17, 18] that solves (1). Let
+x ∈ RE >0 be a positive vector, and let C be the diagonal matrix with entries xj /cj , for j ∈ E.
+       def
+Let L = ACA⊤ ; the matrix L is nonsingular and positive definite. Let p ∈ RN be the unique
+                              def
+solution to Lp = b, and let q = CA⊤ p. The Physarum dynamics for the linear program (1) is
+(2)                             ẋj (t) = qj (t) − xj (t)   for all j ∈ E
+                        def                                        def
+over the domain Ω = RE  >0 , where we used the notation ẋj (t) = (d/dt)xj (t). In vector notation,
+and omitting the implicit dependency on time, the Physarum dynamics can be written as
+(3)                                       ẋ = CA⊤ L−1 b − x.
+The dynamical system has an initial condition of the form x(0) = s for some s ∈ RE         >0 . Existence
+of a solution x(t) to (3) for t ∈ [0, ∞) has been proved by Straszak and Vishnoi [18, Theorem 1.1].
+The system (3) is well-defined irrespective of whether the starting vector x(0) satisfies Ax(0) = b
+or not; the case where it does is referred to as the feasible start case. In the special case where A is
+derived from the signed incidence matrix of a graph, problem (1) is a minimum-cost transshipment
+problem and several of the quantities defined above have an intuitive interpretation; we refer to
+Section 2.2 for details.
+1.2. Our contribution. From previous results, it is known that the solution to (3) exists, and
+that it converges to a feasible and optimal solution of the linear program (1). The known bound
+on the convergence time, however, depends on the largest absolute value of a subdeterminant of
+the constraint matrix A. Our main contribution is to show that, in the case of feasible start, this
+dependence is unnecessary, and that one can obtain a bound that only depends logarithmically on
+the ratio between the starting cost and the optimal cost, and on the relative entropy of the optimal
+solution with respect to the starting solution. More precisely, we prove the following theorem.
+Theorem 1.1. For a feasible initial condition s ∈ RE    >0 , consider the solution x : [0, ∞) → Ω to
+the Physarum dynamics (3) with x(0) = s. Then x(t) is a feasible solution to (1) for any t ≥ 0,
+and for any ǫ > 0, it holds that cost(x(t)) ≤ (1 + ǫ)opt for all
+                                                                   
+                                   6      cost(x(0))         ∗
+                              t≥       ln            + KL(ξ , ξ(0)) ,
+                                   ǫ         opt
+where KL(·, ·) denotes the relative entropy (Kullback-Leibler divergence) between distributions, and
+      def                         def
+ξj (0) = cj xj (0)/cost(x(0)), ξj∗ = cj x∗j /opt for j ∈ E. In particular, cost(x(t)) ≤ (1 + ǫ)opt for
+all                                                               
+                                        6         cost(x(0))
+                                    t≥       2 ln            + ln µ ,
+                                        ǫ            opt
+            def
+where µ = maxj∈E x∗j /xj (0).
+   We remark that our result applies to the continuous formulation of the dynamics, and not
+necessarily to its Euler discretization that has been considered, together with the continuous one,
+in previous papers. While we conjecture that some discretization may be similarly efficient as
+the bound in Theorem 1.1 suggests, it may also be the case that a simple Euler discretization is
+insufficient to obtain such a result and that a more accurate discretization technique, such as a
+Runge-Kutta method, would help in this sense.
+   The appearance of the relative entropy term in our potential function is not an accident: by
+building on the geometric interpretation given by Straszak and Vishnoi [18], we show that when
+the feasible LP region is the unit simplex, independently of whether the dynamics is initialized
+with a feasible point or not, its trajectories coincide with those of the continuous Mirror Descent
+                                                      3
+method of Nemirovski and Yudin [15] in a metric with geometry dictated by the negative entropy
+function – also known as the information geometry metric [1].
+
+1.3. Related work. An undirected variant of the Physarum dynamics has been first proposed
+in the mathematical biology literature by Tero, Kobayashi and Nakagaki [20] as a model for the
+foraging physiology of the true slime mold Physarum polycephalum, an acellular organism that has
+been proved capable of solving shortest path problems effectively in laboratory experiments [13].
+The convergence to optimality of the continuous dynamics for the shortest path problem and for
+its close generalization – the minimum-cost transshipment problem – has been studied analytically
+by Bonifaci, Mehlhorn and Varma [8] and by Ito et al. [10]. An analysis of the convergence time
+of the Euler discretization of the dynamics was carried out by Becchetti et al. [4] for the shortest
+path problem, and by Straszak and Vishnoi [17] for the minimum-cost transshipment problem. In
+summary, these works proved that the Physarum dynamics yields a polynomial-time approximation
+scheme to the shortest path problem and to the transshipment problem, assuming that the costs
+associated to the edges of the network are polynomially bounded. Observe that, in the statement of
+Theorem 1.1, the costs are confined within logarithms, and thus a discrete version of the dynamics
+that achieved a similar convergence time as in Theorem 1.1 would not require the costs to be
+polynomially bounded to be efficient.
+   The generalization of the Physarum dynamics to linear programming problems that we consider
+here has been first suggested by Johannson and Zou [11]. Most relevant to the current paper is
+the work of Straszak and Vishnoi [18], who initiated the rigorous study of the Physarum dynamics
+for LP problems of the form (1). Straszak and Vishnoi proved that a solution to the dynamics
+exists over the entire time horizon [0, ∞), and that a bound on the convergence time of the
+continuous dynamics can be expressed in terms of the parameter D, the largest absolute value
+of a subdeterminant of the constraint matrix A, as summarized by their theorem that we quote
+here for comparison.
+
+Theorem 1.2. [18, Theorem 6.3] Suppose that x : [0, ∞) → Ω is any solution to the Physarum
+dynamics. Then, for some R, ν > 0 depending only on A, b, c, x(0), we have
+
+                                 |cost(x(t)) − opt| ≤ R · exp(−νt),
+
+where one can take ν = D−3 and R = exp(8D2 · kck1 · kbk1 ) · (|E| + Mx )2 . Here,
+                         def
+                       D = max{ det(A′ ) : A′ a square submatrix of A},
+
+and
+                                                              
+                                  def
+                               Mx = max max xj (0), max x−1
+                                                         j  (0)  .
+                                            j∈E        j∈E
+
+   Compared to this result of Straszak and Vishnoi, our contribution is to derive a bound that
+avoids the dependency on D, thus showing that the dynamics are efficient –to the extent made
+precise in the statement of Theorem 1.1– for all linear programs of the form (1), not just for those
+with special constraint matrices. Note that, in general, the bounds of Theorem 1.1 and 1.2 are
+incomparable: for a fixed relative error ǫ, the time for convergence guaranteed by Theorem 1.1
+scales polynomially in the input encoding length, while Theorem 1.2 only yields an exponential
+dependence; on the other hand, for a fixed input, Theorem 1.2 achieves a polynomial dependence on
+log(1/ǫ) (by taking t >> D3 ), while this is O(1/ǫ) in Theorem 1.1. It is known that a simultaneous
+polynomial dependence on log(1/ǫ) and on the input length cannot be achieved [17, Appendix B].
+   As mentioned in the introduction, several convex optimization methods can be interpreted as
+discretizations of ordinary differential equation systems: for example, the Interior Point method
+[3, 12] and the Mirror Descent method [15, Chapter 3]. Straszak and Vishnoi [18] proved that
+the Physarum dynamics with feasible start can be interpreted as natural gradient descent in an
+appropriate information metric. Amari [1] gives an overview of natural gradient methods in the
+context of information geometry; see also Raskutti and Mukherjee [16].
+                                                  4
+1.4. Organization of the paper. The remainder of the paper is organized as follows. In Section 2
+we prove some basic facts about the Physarum dynamics, including an alternative characterization
+of the vector q ∈ RE defined in Section 1.1. In Section 3 we discuss the time of convergence to
+the feasible region of the LP and prove that the set of feasible LP solutions is an invariant set
+for the dynamics. In Section 4 we consider the time evolution of the cost of a feasible solution
+and prove our main result, Theorem 1.1. Finally, in Section 5 we show that when the feasible LP
+region is the unit simplex, the Physarum dynamics can be interpreted as the continuous Mirror
+Descent method in a metric derived from a negative entropy function. Due to space constraints,
+many proofs are deferred to the Appendix.
+
+                               2. Basic properties of the dynamics
+2.1. Notation. In the paper we reserve boldface symbols for vectors or matrices and non-boldface
+                                                                                        def Pn
+symbols for scalars or sets. We use the standard norms: for example, for v ∈ Rn : kvk1 = i=1 |vi |,
+      def Pn
+kvk2 = ( i=1 vi2 )1/2 . With the notation Diag((di )ni=1 ) we mean the n × n diagonal matrix with
+di as the ith term on the main diagonal.
+   For the whole paper, the linear program (1) is fixed, in other words the triple (A, b, c) is fixed.
+Whenever the matrices or vectors C = Diag((xj /cj )j∈E ), L = ACA⊤ , p = L−1 b, or q = CA⊤ p
+appear, they should be understood as computed with respect to a point x ∈ RE       >0 . As x = x(t)
+evolves in time with the dynamics (3), the former quantities are time-varying as well. The quantity
+  def
+E = q⊤ Rq is called the energy of the vector q.
+   For a strictly convex and differentiable function ψ : Ω → R, the Bregman divergence under ψ is
+the function
+                                      def
+                          Dψ (x′ , x) = ψ(x′ ) − ψ(x) − ∇ψ(x)⊤ · (x′ − x),
+where x′ , x ∈ Ω. The Bregman divergence is in general not symmetric, but it is nonnegative and
+satisfies Dψ (x′ , x) = 0 if x′ = x. The Legendre dual of ψ is the function ψ ⋆ : RE → R defined by
+                                              def
+                                       ψ ⋆ (y) = sup (x⊤ y − ψ(x)),
+                                                    x∈RE
+
+Note that a vector x ∈ Ω is a maximizer of x⊤ y − ψ(x) iff y = ∇ψ(x).
+
+2.2. Intuition: The network case. The interpretation of the dynamics defined in Section 1.1 in
+the case where the constraint matrix is a network matrix is particularly appealing, as most of the
+statements below have physical interpretations in that case. Indeed, when A is derived from the
+(signed) node-edge incidence matrix of a graph with node set N and edge set E 1, the dynamics (3)
+have a natural interpretation in terms of electrical networks: the vector b prescribes the external
+in-flow of current at each node, the matrix L is the (reduced) graph Laplacian, the vector p defines
+the Kirchhoff node potentials, the vector q is the electrical flow, and E is the energy dissipation
+(per unit time) of the network. In this context, Lemma 2.1 below is nothing but the principle of
+least action for electrical networks, also known as Thomson’s principle, stating that the electrical
+flow is the feasible flow that minimizes energy dissipation [6, Theorem IX.2]. The duality relation
+(5) becomes Ohm’s law. Proposition 2.2 is the conservation of energy principle, stating that if
+one replaces a network with a current source s and a sink s̄ with a single wire whose resistance
+is the effective resistance of the network, then the total energy in the system does not change [6,
+Theorem IX.3]. Proposition 2.3 is known as Tellegen’s theorem. Of course, the difference with
+classical circuit theory is that the resistor values are dynamically adjusted in response to the flow:
+the Physarum dynamics adjusts the edges’ resistances cj /xj , by updating the xj via (2). In the
+network case, the dynamics converges to the solution of a minimum-cost transshipment problem
+with cost function prescribed by c and node demands/supplies prescribed by b (see for example
+[17, Theorem 1.2]). However, we remark that in the following statements we never need the fact
+that A is derived from a network matrix; our results hold more generally for any full-rank matrix.
+
+   1More precisely, since we stipulated that A should be full rank, we omit from N one of the nodes and omit the
+corresponding row from A; this corresponds to “grounding” the potential value of this node to zero.
+                                                       5
+2.3. Basic properties of the dynamics. We start by giving an alternative characterization of
+             def
+the vector q = CA⊤ L−1 b.
+Lemma 2.1. The vector q ∈ RE defined in Section 1.1 equals the unique optimal solution to the
+continuous quadratic optimization problem:
+(4)                                         min f ⊤ Rf
+                                            s.t. Af = b.
+         def                                                     def
+where R = C−1 ∈ RE×E is the diagonal matrix with value rj = cj /xj for the j-th element of the
+main diagonal. Moreover,
+(5)                                         Rq = A⊤ p.
+Proof. To establish (5), simply left-multiply with R the identity q = CA⊤ p. It remains to establish
+the first part of the claim. Since the objective function in (4) is strictly convex, the problem has a
+unique optimal point. Consider any feasible point f , and define g = f − q. Then Ag = b − b = 0
+and hence
+                  f ⊤ Rf = (q + g)⊤ R(q + g) = q⊤ Rq + 2g⊤ Rq + g⊤ Rg ≥ q⊤ Rq,
+since g⊤ Rg ≥ 0 and g⊤ Rq = g⊤ A⊤ p = (Ag)⊤ p = 0⊤ p = 0. Therefore, the objective function
+value of any feasible point f is at least as large as the objective function value of q.            
+Proposition 2.2. E = b⊤ L−1 b = p⊤ Lp.
+Proof. q⊤ Rq = (b⊤ L−1 AC)R(CA⊤ L−1 b) = (b⊤ L−1 )(ACA⊤ )(L−1 b) =
+= p⊤ Lp.                                                                                             
+Proposition 2.3. Let f satisfy Af = b. Then
+(6)                                      f ⊤ A⊤ p(t) = E(t).
+Proof. Since Af = b, we have p⊤ Af = p⊤ b = p⊤ Lp = E. The last equality is due to Proposition
+2.2.                                                                                         
+
+                             3. Convergence to the feasible region
+   In this section we discuss the time of convergence to the feasible region Ax = b. In particular,
+we aim to show that feasibility is invariant under the dynamics: a feasible starting point remains
+feasible at all times. It turns out that a stronger property holds: the Euclidean norm of the
+                        def
+“infeasibility error” e = Ax − b approaches zero exponentially fast (Lemma 3.2).
+Proposition 3.1. Aẋ = b − Ax.
+Proof. Using the definition of the dynamics (3), Aẋ = ACA⊤ L−1 b − Ax = LL−1 b − Ax =
+b − Ax.                                                                              
+                       def
+Lemma 3.2. Let e(t) = Ax(t) − b. Then ke(t)k2 = ke(0)k2 exp (−t) for any t > 0. In particular,
+if Ax(0) = b then Ax(t) = b for all t > 0.
+Proof. We have
+                             d     2    d
+                                kek2 = (Ax − b)⊤ (Ax − b)
+                             dt        dt
+                                        d  ⊤ ⊤                  
+                                     =     x A Ax − 2b⊤ Ax + b⊤ b =
+                                       dt
+                                     = 2x⊤ A⊤ Aẋ − 2b⊤ Aẋ
+                                   = 2(x⊤ A⊤ − b⊤ )Aẋ
+                                   = 2(Ax − b)⊤ (b − Ax)
+                                             2
+                                   = −2 kek2 ,
+                                                                                                 2
+where we used Proposition 3.1. Solution of the differential equation above yields ke(t)k2 =
+ke(0)k22 exp (−2t). Taking square roots yields the claim.                                 
+                                                  6
+                                 4. Convergence in cost value
+   To analyze the convergence in cost values, and eventually prove Theorem 1.1, it will be useful to
+consider normalized versions of the candidate solution x(t) and of the optimal vector x∗ . For any
+                  def                         def
+j ∈ E, let ξj (t) = cj xj (t)/cost(x(t)), ξj∗ = cj x∗j /opt. Then, by construction, 1⊤ ξ∗ = 1⊤ ξ(t) = 1,
+ξ(t) > 0 and ξ∗ ≥ 0, so ξ(t) and ξ ∗ can be interpreted as probability distributions over E. The
+relative entropy of ξ ∗ with respect to ξ, or Kullback-Leibler divergence KL(ξ ∗ , ξ(t)), is defined as:
+                                                 def
+                                                          X               ξj∗
+                                   KL(ξ ∗ , ξ(t)) =             ξj∗ ln          .
+                                                                         ξj (t)
+                                                          j∈E
+                                                                                           P
+The KL divergence is the Bregman divergence of the negative entropy function x 7→             j xj ln xj ;
+it is always nonnegative, and it is zero iff ξ∗ = ξ(t) (see for example [1, Chapter 1]).
+    We can now define the potential function that is central to our analysis. Let
+                                     def    cost(x(t))
+(7)                             Φ(t) = ln              + KL(ξ ∗ , ξ(t)).
+                                               opt
+Note that the first term is nonnegative whenever x(t) is feasible for the LP, and the second term
+is always nonnegative. Similar to previous analysis of Physarum dynamics based on potential
+functions [4, 17, 18], the potential function Φ contains a term that depends on the cost of the
+candidate solution x, and an “entropic barrier” term that captures the geometry of the feasible
+region: in particular, the second term penalizes distributions that get too close to the boundary
+of the positive orthant whenever the corresponding coordinate of the optimal solution is not on
+the boundary (that is, ξj (t) ≈ 0 but ξj∗ > 0). A difference with respect to previous papers is that
+the potential function (7) is dimensionless, which is natural since our aim is to bound the relative,
+rather than absolute, approximation error.
+   To proceed further, we study the evolution of the potential function over time. We start by
+bounding the derivative of various terms that compose it.
+Lemma 4.1. For any x(t) ∈ RE
+                           >0 ,
+                                                                         1/2
+                               d     cost(x(t))              E(t)
+(8)                               ln            ≤                                   − 1.
+                               dt       opt               cost(x(t))
+Proof.
+                                       d
+                       d     cost(x)      cost(x)
+                          ln         = dt
+                       dt      opt      cost(x)
+                                          c⊤ ẋ
+                                     =
+                                        cost(x)
+                                          ⊤
+                                     (2) c (q − x)
+                                     =
+                                          cost(x)
+                                          c⊤ q
+                                     =           −1
+                                         cost(x)
+                                          P
+                                     (∗)    j∈E rj qj xj
+                                     =                   −1
+                                            cost(x)
+                                          P             1/2 P            1/2
+                                                       2                  2
+                                     (∗∗)     j∈E rj qj           j∈E rj xj
+                                      ≤                                          −1
+                                                          cost(x)
+                                                      1/2
+                                         (Ecost(x))
+                                     =                      − 1,
+                                            cost(x)
+where in the third equality we used the definition of the dynamics, in (*) we used rj = cj /xj , and
+in (**) we used the Cauchy-Schwarz inequality. For the last equality, we used the definition of the
+energy E = q⊤ Rq and (once more) the fact rj = cj /xj .                                            
+                                                      7
+   The following lemma is instrumental in bounding the time derivative of the KL divergence term
+in (7).
+Lemma 4.2. For any x(t) ∈ RE
+                           >0 ,
+
+                                    d X cj x∗j     x∗j       E(t)
+(9)                                            ln        =1−      .
+                                    dt  opt       xj (t)     opt
+                                      j∈E
+
+Proof. We start by computing
+                   X cj          x∗j     1 X                  1 X
+                          x∗j ln     =−       cj x∗j ln xj +       cj x∗j ln x∗j .
+                    j
+                      opt        x j    opt j
+                                                             opt j
+
+The second term above is constant, so
+                         d X cj ∗ x∗j           1 X         ẋj
+                                   xj ln    =−       cj x∗j      =
+                         dt j opt        xj    opt j        xj
+                                                1 X         qj − xj
+                                            =−       cj x∗j         =
+                                               opt j            xj
+                                                            1 X
+                                                   =1−           rj qj x∗j =
+                                                           opt j
+                                                         1 ∗⊤
+                                                   =1−      x Rq =
+                                                        opt
+                                                   (5)   1 ∗⊤ ⊤
+                                                   = 1−     x A p=
+                                                        opt
+                                                   (6)   E
+                                                   = 1−     .
+                                                        opt
+We used (5) (Lemma 2.1) and the alternative characterization of the energy (6) given by Proposition
+2.3.                                                                                              
+Lemma 4.3. For any x(t) ∈ RE
+                           >0 ,
+                                                                   1/2
+                             d                            E(t)                 E(t)
+                                KL(ξ ∗ , ξ(t)) ≤                           −
+                             dt                        cost(x(t))              opt
+Proof.
+             d X cj x∗j      cj x∗j /opt    d X cj x∗j    x∗j   d X cj x∗j    cost(x)
+                        ln                =            ln     +            ln
+             dt j opt      cj xj /cost(x)   dt j opt      xj    dt j opt        opt
+                                            (9)       E     d     cost(x)
+                                            = 1−         +     ln         ·1
+                                                     opt dt         opt
+                                            (8)
+                                                                     1/2
+                                                      E          E
+                                            ≤ 1−         +                 −1
+                                                     opt      cost(x)
+                                                         1/2
+                                                     E             E
+                                            =                   −     .
+                                                  cost(x)         opt
+In the second equality we used Lemma 4.2; for the inequality we applied Lemma 4.1.               
+  We are ready to prove that the more expensive a solution is, the more the potential function
+has to decrease.
+Lemma 4.4. If cost(x(t)) ≥ (1 + ǫ)2 opt for some ǫ ∈ (0, 1/2), then (d/dt)Φ(t) ≤ −ǫ/2.
+             def              def
+Proof. Let γ = E/opt and δ = 1/(1 + ǫ). Combining Lemma 4.1 and Lemma 4.3 yields
+                                                1/2
+                           d                E              E
+                              Φ(t) = 2                −1−
+                           dt            cost(x)          opt
+                                                       8
+                                      (∗)
+                                      ≤ 2δγ 1/2 − 1 − γ =
+                                      = −2(1 − δ)γ 1/2 − (1 − γ 1/2 )2 ,
+where in (∗) we used the assumption cost(x) ≥ (1 + ǫ)2 opt. Note that both summands in the last
+expression are negative. We distinguish two cases. If (1 − γ 1/2 )2 ≥ ǫ/2, then by ignoring the first
+summand above we obtain
+                                   d
+                                     Φ ≤ −(1 − γ 1/2 )2 ≤ −ǫ/2,
+                                  dt
+which proves the claim. Otherwise, if (1 − γ 1/2 )2 < ǫ/2, then γ 1/2 > 1 − (ǫ/2)1/2 and by ignoring
+the second summand we obtain
+              d                                      1 − (ǫ/2)1/2         1/2
+                Φ ≤ −2(1 − δ)(1 − (ǫ/2)1/2 ) ≤ −2 ·                ǫ ≤ −2     ǫ < −ǫ/2.
+             dt                                          1+ǫ              3/2
+                                                                                                   
+  The next lemma ensures that, for feasible solutions, the energy is always a valid lower bound
+on the cost.
+Lemma 4.5. Suppose x(t) ≥ 0, Ax(t) = b. Then E(t) ≤ cost(x(t)).
+Proof. By the assumption, x(t) is a feasible LP solution. By Lemma 2.1, q(t) is a minimizer of the
+quadratic form f ⊤ Rf among all vectors f satisfying Af = b. One possible such vector is x. Thus,
+                                                   X cj
+(10)                      E = q⊤ Rq ≤ x⊤ Rx =             x2 = cost(x).
+                                                       xj j
+                                                      j∈E
+
+                                                                                                   
+  As a corollary, by Lemma 4.1 the cost of a feasible solution does not increase over time.
+Corollary 4.6. Suppose x(t) ≥ 0, Ax(t) = b. Then (d/dt)cost(x(t)) ≤ 0.
+Proof. Combine Lemma 4.5 and Lemma 4.1.                                                            
+   All ingredients are now into place to derive our main claim, from which Theorem 1.1 will directly
+follow.
+Theorem 4.7. Suppose x(0) > 0, Ax(0) = b. Then
+  (a) x(t) is feasible for LP (1) for any t ≥ 0;
+  (b) cost(x(t)) ≤ (1 + ǫ)opt for all
+                                                                     
+                             Φ(0)     6      cost(x(0))       ∗
+                          t≥       =      ln            + KL(ξ , ξ(0)) .
+                              ǫ/6     ǫ         opt
+Proof. By assumption, we start with a feasible initial solution x(0), thus by Lemma 3.2 the solution
+x(t) stays feasible for all t ≥ 0; this proves point (a). By Corollary 4.6, the cost of x(t) can only
+decrease as t increases. To prove point (b), assume, by contradiction, that cost(x(t0 )) is larger
+than (1 + ǫ)opt for some t0 that is larger than Φ(0)/(ǫ/6). By Lemma 4.4, (d/dt)Φ(t) ≤ −ǫ/6 for
+all t such that
+                        cost(x(t)) ≥ (1 + ǫ)opt = (1 + 3ǫ′ )opt ≥ (1 + ǫ′ )2 opt,
+         def
+where ǫ′ = ǫ/3. In particular, (d/dt)Φ(t) ≤ −ǫ/6 would hold for all t ∈ [0, t0 ]. This implies the
+                                              Rt d
+desired contradiction, since Φ(t0 ) = Φ(0) + 0 0 dt Φ(t) ≤ Φ(0) − (ǫ/6)t0 would have to be negative.
+This is impossible since x(t) is feasible at all times and thus Φ(t) is nonnegative for all t.    
+Proof of Theorem 1.1. Theorem 4.7 already proves the first part of Theorem 1.1. For the second
+part, observe that if
+                                             def          x∗j
+                                           µ = max             ,
+                                                  j∈E xj (0)
+then
+                                       X cj x∗j      cj x∗j /opt
+                      KL(ξ ∗ , ξ(t)) =          ln
+                                          opt      cj xj /cost(x)
+                                    j∈E
+                                                  9
+                                      X cj x∗j x∗j X cj x∗j      cost(x)
+                                  =              ln +         ln
+                                      j
+                                         opt   x j     j
+                                                         opt       opt
+                                             X cj x∗j  
+                                                           cost(x)
+                                                                      X cj x∗j
+                                  ≤ (ln µ) ·          + ln           ·
+                                             j
+                                                opt          opt       j
+                                                                         opt
+                                           cost(x)
+                                  = ln µ + ln      .
+                                             opt
+Substitution in the bound of Theorem 4.7 yields the claim.                                         
+
+                        5. Physarum dynamics for the unit simplex
+   In this final section we connect the Physarum dynamics to a classical convex optimization
+method and provide an intuitive justification for the relative entropy term in our potential function
+(7). We prove that when the feasible LP region is the unit simplex, the trajectories of (3) coincide
+(even outside the simplex) with those of the continuous Mirror Descent method in an information
+metric.
+   Nemirovksi and Yudin [15] defined Mirror Descent as a system of ordinary differential equations
+aiming to minimize a convex function F : Ω → R (for some Ω ⊆ Rn ). The Mirror Descent system
+has the form
+(11)                                           x = ∇ψ ⋆ (y)
+                                              ẏ = −∇F (x),
+where ψ is a strictly convex function on Ω and ψ ⋆ is its Legendre dual. The vector y ∈ Rn is
+connected to the primal vector x by the invertible relation x = ∇ψ ⋆ (y). The dynamics is thus
+defined on the dual variables y and “reflected” in the primal variables x.
+                                     E                                                      def
+P In the Physarum setting, Ω = R>0 , and we take ψ to be the negative entropy function ψ(x) =
+  j∈E xj ln xj . This allows us to prove the following.
+
+                                                                       def
+Theorem 5.1. Let A = 1⊤ , b = 1 in (1), and let F (x) = 1⊤ x + ln E(x). Then, the dynamics
+(2) coincide with the Mirror Descent dynamics (11).
+Proof. A proof of the convergence of (11) to optimality is based on a potential function V (x(t))
+that equals the Bregman divergence, under the function ψ, from the optimal point x∗ to the current
+primal point:
+                                                   def
+(12)                                   V (x(t)) = Dψ (x∗ , x(t)).
+The Bregman divergence under ψ is just the (unnormalized) relative entropy between x∗ and x(t):
+(13)                Dψ (x∗ , x(t)) = ψ(x∗ ) − ψ(x(t)) − ∇ψ(x(t))⊤ · (x∗ − x(t))
+                                     X               X
+                                   =    x∗j ln x∗j −   xj (t) ln xj (t) +
+                                      j∈E                 j∈E
+                                                         X
+                                                   −           (1 + ln xj (t))(x∗j − xj (t))
+                                                         j∈E
+                                      X             x∗j     X          X
+                                  =         x∗j ln        +   xj (t) −   x∗j .
+                                       j
+                                                   xj (t)   j          j
+
+The Legendre dual of ψ is                          X
+                                       ψ ⋆ (y) =          exp(yj − 1).
+                                                   j∈E
+The primal-dual connection prescribed by (11) is then yj = 1 + ln xj for each j ∈ E. When the
+feasible LP region is the unit simplex (that is, A = 1⊤ , b = 1 in (1)), the relevant quantities for
+the Physarum dynamics are easily computed as:
+                                                 X
+                                  L = 1⊤ C1 =      xj /cj ,
+                                                       j∈E
+                                                        10
+                                                                        −1
+                                                             X
+                                                 −1
+                                       E = bL         b=           xj /cj     ,
+                                                             j∈E
+                                             xj
+                                      qj =      ·E     for j ∈ E,
+                                             cj
+so the Physarum dynamics (3) is
+                                                xj
+(14)                                    ẋj =      · E − xj        for j ∈ E.
+                                                cj
+By a change of variables according to the primal-dual correspondence yj = 1 + ln xj , we obtain the
+dual-space version of the dynamics,
+                                              1
+(15)                                     ẏj = E(x) − 1,
+                                              cj
+                         −1
+                             = ( j exp(yj − 1)/cj )−1 . We observe that this is just the Mirror
+               P                P
+with E(x) = ( j xj /cj )
+                                                              def
+Descent method (11) with objective function F (x) = 1⊤ x + ln E(x). In fact, we compute
+                                               ∂E(x) −1
+(16)                           (∇F (x))j = 1 +      · E (x)
+                                                ∂xj
+                                                          !−2                             !
+                                               1 X xk                          X xk
+                                           =1−                ·
+                                               cj      ck                            ck
+                                                        k∈E                    k∈E
+                                                   1
+                                           =1−        E(x),
+                                                   cj
+and then (15) is nothing but ẏ = −∇F (x).                                                                      
+   Note that we do not require the initial point x(0) to be feasible.
+
+Acknowledgment. The author would like to thank Kurt Mehlhorn for suggesting a shorter proof of
+Lemma 2.1.
+
+                                                  References
+ [1] S. Amari. Information Geometry and Its Applications. Springer, 2016.
+ [2] S. Arora, E. Hazan, and S. Kale. The multiplicative weights update method: a meta-algorithm and applications.
+     Theory of Computing, 8(1):121–164, 2012.
+ [3] D. A. Bayer and J. C. Lagarias. The nonlinear geometry of linear programming, I. Affine and projective scaling
+     trajectories. Transactions of the American Mathematical Society, 314:499–526, 1989.
+ [4] L. Becchetti, V. Bonifaci, M. Dirnberger, A. Karrenbauer, and K. Mehlhorn. Physarum can compute shortest
+     paths: Convergence proofs and complexity bounds. In Proc. 40th Int. Colloquium on Automata, Languages
+     and Programming, volume 7966 of Lecture Notes in Computer Science, pages 472–483. Springer, 2013.
+ [5] A. Beck and M. Teboulle. Mirror descent and nonlinear projected subgradient methods for convex optimization.
+     Oper. Res. Lett., 31(3):167–175, 2003.
+ [6] B. Bollobás. Modern Graph Theory. Springer, New York, 1998.
+ [7] V. Bonifaci. Physarum can compute shortest paths: A short proof. Inf. Process. Lett., 113(1-2):4–7, 2013.
+ [8] V. Bonifaci, K. Mehlhorn, and G. Varma. Physarum can compute shortest paths. In Proc. 23rd ACM-SIAM
+     Symposium on Discrete Algorithms, pages 233–240. SIAM, 2012.
+ [9] B. Chazelle. Natural algorithms and influence systems. Communications of the ACM, 55(12):101–110, 2012.
+[10] K. Ito, A. Johansson, T. Nakagaki, and A. Tero. Convergence properties for the Physarum solver.
+     arXiv:1101.5249v1, Jan 2011.
+[11] A. Johannson and J. Y. Zou. A slime mold solver for linear programming problems. In How the World Computes
+     - Turing Centenary Conference and 8th Conference on Computability in Europe, pages 344–354. Springer, 2012.
+[12] N. K. Karmarkar. Riemannian geometry underlying interior–point methods for linear programming. In J. C.
+     Lagarias and M. J. Todd, editors, Mathematical Developments Arising from Linear Programming, volume 114
+     of Contemporary Mathematics, pages 51–75. American Mathematical Society, 1990.
+[13] T. Nakagaki, H. Yamada, and Á. Tóth. Maze-solving by an amoeboid organism. Nature, 407:470, 2000.
+[14] S. Navlakha and Z. Bar-Joseph. Algorithms in nature: the convergence of systems biology and computational
+     thinking. Molecular Systems Biology, 7:546, 2011.
+[15] A. S. Nemirovski and D. B. Yudin. Problem Complexity and Method Efficiency in Optimization. John Wiley,
+     1983.
+                                                        11
+[16] G. Raskutti and S. Mukherjee. The information geometry of mirror descent. IEEE Trans. Information Theory,
+     61(3):1451–1457, 2015.
+[17] D. Straszak and N. K. Vishnoi. Natural algorithms for flow problems. In Proc. 27th ACM-SIAM Symposium
+     on Discrete Algorithms, pages 1868–1883. SIAM, 2016.
+[18] D. Straszak and N. K. Vishnoi. On a natural dynamics for linear programming. In Proc. ACM Conference on
+     Innovations in Theoretical Computer Science, page 291. ACM, 2016.
+[19] A. Tero, R. Kobayashi, and T. Nakagaki. Physarum solver: A biologically inspired method of road-network
+     navigation. Physica A, 363:115–119, 2006.
+[20] A. Tero, R. Kobayashi, and T. Nakagaki. A mathematical model for adaptive transport network in path finding
+     by true slime mold. Journal of Theoretical Biology, 244:553–564, 2007.
+[21] A. Tero, S. Takagi, T. Saigusa, K. Ito, D. P. Bebber, M. D. Fricker, K. Yumiki, R. Kobayashi, and T. Nakagaki.
+     Rules for biologically inspired adaptive network design. Science, 327:439–442, 2010.
+
+
+
+
+                                                        12
+

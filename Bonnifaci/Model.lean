@@ -3,7 +3,10 @@ Copyright (c) 2026 MultiAgency bonifaci-lane.
 -/
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+
+noncomputable section
 
 /-!
 # The linear-programming model of the Physarum dynamics
@@ -38,19 +41,6 @@ structure LPData (N E : Type*) [Fintype N] [Fintype E] where
   /-- Cost positivity. -/
   hc : ∀ e, 0 < c e
 
-namespace Bonnifaci
-
-/-- The LP objective `cost(x) = cᵀx`. -/
-def LPData.cost (d : LPData N E) (x : E → ℝ) : ℝ := ∑ e, d.c e * x e
-
-/-- LP feasibility: `x ≥ 0` and `A x = b`. -/
-def LPData.IsFeasible (d : LPData N E) (x : E → ℝ) : Prop :=
-  (∀ e, 0 ≤ x e) ∧ ∀ n, ∑ e, d.A n e * x e = d.b n
-
-/-- Edge resistance at a strictly positive point `x`: `r_j = c_j / x_j`
-(the dynamically adjusted tube resistance). -/
-def LPData.res (d : LPData N E) (x : E → ℝ) (e : E) : ℝ := d.c e / x e
-
 /--
 **The Laplacian-solve layer, quarantined.** `Step d x` bundles the output of the
 electrical-network solve at the point `x` (Section 1.1 of [Bonifaci 2016]):
@@ -78,14 +68,6 @@ structure LPData.Step (d : LPData N E) (x : E → ℝ) where
   /-- Thomson's principle (Lemma 2.1). -/
   thomson : ∀ f : E → ℝ, (∀ n, ∑ e, d.A n e * f e = d.b n) →
     ∑ e, d.c e / x e * q e ^ 2 ≤ ∑ e, d.c e / x e * f e ^ 2
-
-/-- Energy dissipation `ℰ = qᵀ R q` of the electrical flow at `x`. -/
-def LPData.energy (d : LPData N E) (x : E → ℝ) (st : d.Step x) : ℝ :=
-  ∑ e, d.c e / x e * st.q e ^ 2
-
-/-- The dynamics is at rest: `q = x`. -/
-def LPData.IsFixedPoint (d : LPData N E) (x : E → ℝ) (st : d.Step x) : Prop :=
-  ∀ e, st.q e = x e
 
 /--
 A global solution trajectory of the directed Physarum dynamics, eq. (3) of
@@ -119,5 +101,50 @@ structure LPData.Solution (d : LPData N E) where
   hdiff : ∀ (t : ℝ) (e : E), DifferentiableAt ℝ (fun u => x u e) t
   /-- The ODE: `ẋ = q − x`. -/
   hode : ∀ (t : ℝ) (e : E), deriv (fun u => x u e) t = q t e - x t e
+
+/- ## LP data accessors — declared at ROOT (not inside `namespace Bonnifaci`).
+Dot notation `d.cost` resolves a declaration named `LPData.cost` in the root
+namespace of the type head `LPData`; nesting these under `Bonnifaci` makes every
+`d.cost` / `d.IsFeasible` / `d.IsFixedPoint` fail with "The environment does not
+contain `LPData.cost`". -/
+
+/-- The LP objective `cost(x) = cᵀx`. -/
+def LPData.cost (d : LPData N E) (x : E → ℝ) : ℝ := ∑ e, d.c e * x e
+
+/-- LP feasibility: `x ≥ 0` and `A x = b`. -/
+def LPData.IsFeasible (d : LPData N E) (x : E → ℝ) : Prop :=
+  (∀ e, 0 ≤ x e) ∧ ∀ n, ∑ e, d.A n e * x e = d.b n
+
+/-- Edge resistance at a strictly positive point `x`: `r_j = c_j / x_j`
+(the dynamically adjusted tube resistance). -/
+def LPData.res (d : LPData N E) (x : E → ℝ) (e : E) : ℝ := d.c e / x e
+
+/-- Energy dissipation `ℰ = qᵀ R q` of the electrical flow at `x`. -/
+def LPData.energy (d : LPData N E) (x : E → ℝ) (st : LPData.Step d x) : ℝ :=
+  ∑ e, d.c e / x e * st.q e ^ 2
+
+/-- The dynamics is at rest: `q = x`. -/
+def LPData.IsFixedPoint (d : LPData N E) (x : E → ℝ) (st : LPData.Step d x) : Prop :=
+  ∀ e, st.q e = x e
+
+namespace Bonnifaci
+
+/-- Pointwise differentiability of a finite sum of scalar functions. -/
+theorem differentiableAt_finset_sum {f : E → ℝ → ℝ} {t : ℝ}
+    (h : ∀ e, DifferentiableAt ℝ (f e) t) :
+    DifferentiableAt ℝ (fun u => ∑ e, f e u) t := by
+  have h' : (fun u => ∑ e, f e u) = ∑ e, f e := by
+    funext u; simp [Finset.sum_apply]
+  rw [h']
+  exact DifferentiableAt.sum (fun e _ => h e)
+
+/-- Pointwise derivative of a finite sum of scalar functions. -/
+theorem deriv_finset_sum {f : E → ℝ → ℝ} {t : ℝ}
+    (h : ∀ e, DifferentiableAt ℝ (f e) t) :
+    deriv (fun u => ∑ e, f e u) t = ∑ e, deriv (f e) t := by
+  have h' : (fun u => ∑ e, f e u) = ∑ e, f e := by
+    funext u; simp [Finset.sum_apply]
+  rw [h']
+  exact deriv_sum (fun e _ => h e)
 
 end Bonnifaci

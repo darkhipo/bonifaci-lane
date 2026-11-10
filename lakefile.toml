@@ -1,4 +1,4 @@
-name = "bonifaci-lane"
+name = "bonifaci_lane"
 version = "0.1.0"
 defaultTargets = ["Bonnifaci"]
 

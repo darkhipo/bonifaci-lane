@@ -3,6 +3,8 @@ Copyright (c) 2026 MultiAgency bonifaci-lane.
 -/
 import Bonnifaci.Thm11
 
+noncomputable section
+
 /-!
 # The duality sandwich (Lemmas 4.2 core, downstream of P3)
 

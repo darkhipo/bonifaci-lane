@@ -1,7 +1,7 @@
-/-
-Copyright (c) 2026 MultiAgency bonifaci-lane.
--/
+/- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 import Bonnifaci.Model
+
+noncomputable section
 
 /-!
 # Fixed point = LP optimum: the convex-duality identification
@@ -30,52 +30,55 @@ variable {N E : Type*} [Fintype N] [Fintype E]
 /-- At a rest point, Ohm's law makes the potentials an *exactly tight* dual
 certificate: `c = Aᵀ p`. -/
 theorem fixed_point_dual_tight {d : LPData N E} {x : E → ℝ} (hx : ∀ e, 0 < x e)
-    (st : d.Step x) (hfp : d.IsFixedPoint x st) (e : E) :
+    (st : LPData.Step d x) (hfp : d.IsFixedPoint x st) (e : E) :
     d.c e = ∑ n, d.A n e * st.p n := by
-  have h1 : d.c e / x e * x e = d.c e := by field_simp
+  have h1 : d.c e / x e * x e = d.c e := by
+    rw [div_mul_cancel₀ _ (ne_of_gt (hx e))]
   have h2 : d.c e / x e * x e = ∑ n, d.A n e * st.p n := by
     rw [← st.ohm e, hfp e]
-  rw [← h1, h2]
+  exact h1.symm.trans h2
 
-/-- Helper: at a rest point, `Σ_e c_e y_e = Σ_n p_n b_n` for every feasible `y`. -/
+/-- Helper: at a rest point, the cost of *any* feasibility-respecting `z` collapses to
+the potential inner product `Σ_n p_n b_n` — the dual objective is attainable. -/
 private theorem cost_eq_potential_inner {d : LPData N E} {x : E → ℝ} (hx : ∀ e, 0 < x e)
-    (st : d.Step x) (hfp : d.IsFixedPoint x st) {y : E → ℝ} (hy : d.IsFeasible y) :
-    d.cost y = ∑ n, st.p n * d.b n := by
+    (st : LPData.Step d x) (hfp : d.IsFixedPoint x st) {y : E → ℝ} (hy : d.IsFeasible y) :
+    d.cost y = d.cost x := by
   have htight := fixed_point_dual_tight hx st hfp
   have hbx : ∀ n, d.b n = ∑ e, d.A n e * x e := fun n => by
     rw [← st.hflow n]
     exact Finset.sum_congr rfl fun e _ => by rw [hfp e]
-  have stepA : ∑ e, d.c e * y e = ∑ n, st.p n * d.b n := by
-    have h1 : ∑ e, d.c e * y e = ∑ e, (∑ n, d.A n e * st.p n) * y e :=
-      Finset.sum_congr rfl fun e _ => by rw [htight e]
-    have h2 : ∑ e, (∑ n, d.A n e * st.p n) * y e
-        = ∑ e, ∑ n, st.p n * (d.A n e * y e) := by
-      refine Finset.sum_congr rfl fun e _ => ?_
-      rw [Finset.mul_sum]
-      exact Finset.sum_congr rfl fun n _ => by ring
-    rw [h1, h2, Finset.sum_comm]
-    refine Finset.sum_congr rfl fun n _ => ?_
-    rw [← Finset.mul_sum, hy.2 n]
-  refine stepA.trans ?_
-  have h1 : ∑ n, st.p n * d.b n = ∑ n, st.p n * ∑ e, d.A n e * x e :=
-    Finset.sum_congr rfl fun n _ => by rw [hbx n]
-  rw [h1, Finset.sum_comm]
-  refine Finset.sum_congr rfl fun e _ => ?_
-  rw [htight e, Finset.sum_mul]
-  exact Finset.sum_congr rfl fun n _ => by ring
+  have key : ∀ z : E → ℝ, (∀ n, ∑ e, d.A n e * z e = d.b n) →
+      d.cost z = ∑ n, st.p n * d.b n := by
+    intro z hz
+    calc d.cost z = ∑ e, d.c e * z e := rfl
+      _ = ∑ e, (∑ n, d.A n e * st.p n) * z e := by
+            refine Finset.sum_congr rfl fun e _ => ?_
+            rw [htight e]
+      _ = ∑ e, ∑ n, st.p n * (d.A n e * z e) := by
+            refine Finset.sum_congr rfl fun e _ => ?_
+            rw [Finset.sum_mul]
+            exact Finset.sum_congr rfl fun n _ => by ring
+      _ = ∑ n, ∑ e, st.p n * (d.A n e * z e) := Finset.sum_comm
+      _ = ∑ n, st.p n * ∑ e, d.A n e * z e := by
+            refine Finset.sum_congr rfl fun n _ => ?_
+            rw [Finset.mul_sum]
+      _ = ∑ n, st.p n * d.b n := by
+            refine Finset.sum_congr rfl fun n _ => ?_
+            rw [hz n]
+  rw [key y hy.2, key x fun n => (hbx n).symm]
 
 /-- **The identification.** At a rest point, *every* feasible point has the same cost
 as the rest point — the LP value is constant on the feasible set (exactly what
 `c = Aᵀ p` means). -/
 theorem fixed_point_cost_eq {d : LPData N E} {x : E → ℝ} (hx : ∀ e, 0 < x e)
-    (st : d.Step x) (hfp : d.IsFixedPoint x st) {y : E → ℝ} (hy : d.IsFeasible y) :
-    d.cost y = d.cost x := by
-  rw [cost_eq_potential_inner hx st hfp hy, cost_eq_potential_inner hx st hfp hy]
+    (st : LPData.Step d x) (hfp : d.IsFixedPoint x st) {y : E → ℝ} (hy : d.IsFeasible y) :
+    d.cost y = d.cost x :=
+  cost_eq_potential_inner hx st hfp hy
 
 /-- **Fixed point ⇒ LP-optimality** (finite case): the rest point is optimal for
 `min cᵀy s.t. A y = b, y ≥ 0`. -/
 theorem fixed_point_lp_optimal {d : LPData N E} {x : E → ℝ} (hx : ∀ e, 0 < x e)
-    (st : d.Step x) (hfp : d.IsFixedPoint x st) {y : E → ℝ} (hy : d.IsFeasible y) :
+    (st : LPData.Step d x) (hfp : d.IsFixedPoint x st) {y : E → ℝ} (hy : d.IsFeasible y) :
     d.cost x ≤ d.cost y := by
   rw [fixed_point_cost_eq hx st hfp hy]
 
