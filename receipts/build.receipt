@@ -1,8 +1,7 @@
-== receipt 2026-11-10T07:04:21Z ==
+== receipt 2026-11-10T07:12:39Z ==
 exit_code=0
-elapsed_s=17
-gate=memory_pressure_free=67%_swapouts_delta=0 (R2125609494 replacement gate)
-lock=override_logged_in_swap-gate.log
+elapsed_s=16
+gate=memory_pressure_free>15%_swapouts_delta=0 (R2125609494)
 olean[Model]=PRESENT 351176 bytes
 olean[KL]=PRESENT 198680 bytes
 olean[Core]=PRESENT 303296 bytes
@@ -12,4 +11,5 @@ olean[Feasibility]=PRESENT 167104 bytes
 olean[Theorem]=PRESENT 61896 bytes
 olean[Thm11]=PRESENT 723824 bytes
 olean[Duality]=PRESENT 219600 bytes
+olean[Lemma41]=PRESENT 258256 bytes
 axiom_banner_exit=0

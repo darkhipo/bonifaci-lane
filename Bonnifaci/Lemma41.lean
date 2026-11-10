@@ -110,6 +110,7 @@ theorem cost_log_deriv_le (d : LPData N E) (S : d.Solution) (xstar : E → ℝ) 
   have h4 : Real.sqrt (energyAt d S t) / Real.sqrt (d.cost (S.x t))
       = Real.sqrt (energyAt d S t / d.cost (S.x t)) := by
     rw [Real.sqrt_div]
+    exact hE
   rw [h4] at h2
   linarith
 

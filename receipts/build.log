@@ -1,4 +1,4 @@
-⚠ [2184/2187] Replayed Bonnifaci.Thm11
+⚠ [2184/2188] Replayed Bonnifaci.Thm11
 warning: Bonnifaci/Thm11.lean:60:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
 If you'd rather continue using `push_neg` in your project, you can implement it as follows:
 ```
@@ -16,6 +16,6 @@ macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
 warning: Bonnifaci/Thm11.lean:334:6: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-✔ [2185/2187] Built Bonnifaci.Duality (9.1s)
-✔ [2186/2187] Built Bonnifaci (5.2s)
-Build completed successfully (2187 jobs).
+✔ [2186/2188] Built Bonnifaci.Lemma41 (11s)
+✔ [2187/2188] Built Bonnifaci (2.2s)
+Build completed successfully (2188 jobs).
