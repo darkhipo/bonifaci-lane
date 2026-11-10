@@ -1,0 +1,32 @@
+{
+  "elapsed_s": 18.5,
+  "finished_at": "2026-11-10T10:26:26.726796+00:00",
+  "log": "receipts/build_triangle.log",
+  "olean_count": 18,
+  "oleans": [
+    "Core",
+    "Duality",
+    "Feasibility",
+    "Features",
+    "KL",
+    "Lemma41",
+    "Lemma43",
+    "M6",
+    "M7",
+    "M8",
+    "Model",
+    "Mu",
+    "NetworkRank",
+    "Optimality",
+    "ShortestPath",
+    "Theorem",
+    "Thm11",
+    "Triangle"
+  ],
+  "post_free": "330Gi",
+  "post_swap": "total = 17408.00M  used = 16492.62M  free = 915.38M  (encrypted)",
+  "pre_free": "330Gi",
+  "pre_swap": "total = 17408.00M  used = 16492.62M  free = 915.38M  (encrypted)",
+  "rc": 0,
+  "waited_for_lock_s": 0
+}

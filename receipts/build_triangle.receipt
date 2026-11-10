@@ -1,0 +1,50 @@
+BUILD RECEIPT — §9.8 (the triangle: the positive-length-cycle scope witness)
+base commit : 53563c0 (closure_cost.py) + Triangle working tree
+date        : 2026-11-10T10:26:08Z..10:26:26Z
+lock        : receipts/build_detached.py, fcntl single-writer on /Volumes/Substrate-1/bigo/.build.lock
+              (waited 0 s)
+gate        : disk free 330Gi (92% used, unchanged); swap 16492.62M used BEFORE and 16492.62M
+              AFTER the lock window — it did not grow
+command     : lake build Bonnifaci   (cwd = lane root, PATH prefixed with ~/.elan/bin)
+
+RESULT      : exit 0, 2261 jobs (was 2260 before Triangle), Build completed successfully
+NEW MODULES : 1  (Bonnifaci.Triangle — 9.4 s). 0 new Mathlib modules pulled: the only new
+              import is Bonnifaci.NetworkRank, already built in this target.
+WARNINGS    : 4, all pre-existing replays (Thm11 x3 push_neg/simpa; Lemma43 x1 unused var);
+              Triangle contributes 0  (`lake env lean Bonnifaci/Triangle.lean` twice: silent,
+              no errors, no warnings, no info)
+ERRORS      : 0
+
+TRANSPORT NOTE (measured, the reason the driver is not a bare `lake build`): two FOREGROUND
+attempts were SIGTERM'd at 6 s and 12 s — build_lock.py printed `RELEASE rc=-15` and the axiom
+banner exited 143 — while every body governor logged zero kills in the same window
+(lean_build_governor `killed=0 frozen=0`; no entry in kill-ledger.jsonl; swap_shedder and
+memory_guardian silent). The identical command under `start_new_session=True` completes in
+18.5 s. Group-scoped external kill (the harness process-group deadline, R2125609581 transport
+discipline), not a broken build. receipts/build_detached.py and receipts/run_detached.py exist
+so the next measure does not have to rediscover this at the cost of two phantom wounds.
+
+--- lake build Bonnifaci (tail) ---
+✔ [2260/2261] Built Bonnifaci (14s)
+Build completed successfully (2261 jobs).
+[detached_build] RELEASE rc=0 elapsed=18.5s
+[detached_build] POST swap=total = 17408.00M  used = 16492.62M  free = 915.38M  free_disk=330Gi
+
+--- oleans (18) ---
+Core Duality Feasibility Features KL Lemma41 Lemma43 M6 M7 M8 Model Mu
+NetworkRank Optimality ShortestPath Theorem Thm11 Triangle
+    ls .lake/build/lib/lean/Bonnifaci/*.olean | wc -l  ->  18   (17 before + Triangle)
+
+--- axioms (receipts/axioms_triangle.txt, exit 0, run detached) ---
+6 theorems, every one:
+    depends on axioms: [propext, Classical.choice, Quot.sound]
+zero `sorry`, zero `axiom` commands in Bonnifaci/*.lean. Measured: exactly 3 `sorry` strings
+in the tree and every one is prose — Bonnifaci.lean:32, Thm11.lean:37, M7.lean:34. (The
+Bonnifaci.lean address moved 31 -> 32 because the new import was added above the header
+docstring; re-measured rather than copied from §9.7.4.) The two `admit` hits are the word
+"admits" in Triangle.lean's prose, not tactics.
+
+--- file ---
+Bonnifaci/Triangle.lean  148 lines, 8504 bytes; 7 declarations (1 def: triangle; 6 theorems:
+triangle_connected, triangle_telescope, triangle_no_tight_potential,
+triangle_groundLPData_step_nonempty, triangle_no_fixed_point, path3_tight_potential).

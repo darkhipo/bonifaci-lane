@@ -976,11 +976,124 @@ existence — the analytic content of §9.3, unchanged, with its algebra no long
 
 1. **`HasSolution`** is now the *only* named seam on the network instance class, and §9.3's
    measurement stands (6616 modules of ODE library, plus global two-sided existence).
-2. **A positive-length-cycle instance** (§9.6.5 item 3) is now cheaper than it was: `path3_connected`
-   shows how cheap a connectivity proof of a concrete graph is — a triangle needs the same
-   three-node case split, not more — so the remaining work there is the *negation* of the dual
-   feasibility system, not the connectivity. It would make §9.6.3's scope note machine-checkable.
+2. **A positive-length-cycle instance** (§9.6.5 item 3) — **DISCHARGED in §9.8**. `path3_connected`
+   showed how cheap a connectivity proof of a concrete graph is; the *negation* of the dual
+   feasibility system turned out to be equivalently cheap (`Fin.sum_univ_three` + `linarith`), and
+   the scope note is now a theorem.
 3. **`W/μ` tightening** (§9.2, §9.5 item 3) is unchanged and still available.
 4. **A general bridge** — `Connected` ⇒ full row rank for an arbitrary `LPData` whose rows come from
    a network-like incidence — is *not* done and not obviously worth it: the specific statement above
    is what the §2.2 instance class needs, and generality here would buy nothing the campaign uses.
+
+## 9.8 The triangle — §9.6.5 item 3, discharged (the scope note is now machine-checked)
+
+§9.6.3's caveat was prose: *"a rest point with `q = x` forces `p(head e) − p(tail e) = len e` on
+every edge, so in the interior a rest point exists only when the lengths are conservative — on a
+graph with a positive-length cycle it does not."* New file: `Bonnifaci/Triangle.lean` (148 lines,
+8504 bytes, 7 declarations: 1 def + 6 theorems). Root target grew 2260 → 2261 jobs; **18 oleans**;
+one new import, and it is our own module (`NetworkRank`).
+
+### 9.8.1 What is proved
+
+| declaration | content |
+|---|---|
+| `triangle` | the directed cycle `0 → 1 → 2 → 0`: `tail := ![0,1,2]`, `head := ![1,2,0]`, `len := ![a,b,c]` |
+| `triangle_connected` | it is connected — the `path3_connected` pattern, and note it never uses the closing edge |
+| `triangle_telescope` | **the cycle identity**: for *any* `P`, `∑_e (P(head e) − P(tail e)) = 0` |
+| `triangle_no_tight_potential` | **no `P` is tight on all three edges** — the equations add to `0 = a + b + c > 0` |
+| `triangle_groundLPData_step_nonempty` | the Laplacian layer *accepts* the triangle: `Step x` exists for every `x > 0` |
+| `triangle_no_fixed_point` | **the scope note, machine-checked**: no rest point at any positive tube vector, for any demand |
+| `path3_tight_potential` | **positive control**: on the tree the same tightness system *is* solvable (`path3Dist`) |
+
+The pair `triangle_groundLPData_step_nonempty` / `triangle_no_fixed_point` is the point of stating
+them together: the triangle is connected, so the rank bridge applies and M6's `exists_step` fires —
+the electrical solve exists with Kirchhoff, Ohm and Thomson. **Only** the rest condition fails.
+Stating the negation alone would have left the reader free to conclude the triangle is outside the
+theory; it is inside it, and the obstruction is the lengths.
+
+### 9.8.2 The proof, and why it is short
+
+`triangle_telescope` is one `simp [triangle, Fin.sum_univ_three]` + `ring`: the heads `1,2,0` and the
+tails `0,1,2` enumerate the same node set, so the two sums agree after reindexing — no permutation
+`Equiv`, no `Finset.sum_perm`. `triangle_no_tight_potential` rewrites the summand with `hP` via
+`Finset.sum_congr`, evaluates `∑ len = a + b + c`, and `linarith` closes against `0 < a, 0 < b,
+0 < c`. `triangle_no_fixed_point` is then a two-line consumer of
+`Network.fixed_point_potentials_tight`: a rest point would *supply* the forbidden potential. The
+demand `(s, t)` never appears — tightness at a rest point is a statement about the lengths alone,
+which is exactly the structural claim the scope note makes.
+
+### 9.8.3 Five findings, all measured on this pin
+
+1. **`Fin.sum_univ_three` + `simp` is the whole cycle identity.** The tempting route — an `Equiv`
+   between `Fin 3` under `head` and under `tail`, or `Finset.sum_perm` — is unnecessary: `simp`
+   unfolds both vector literals to three applications and `ring` closes the commutativity. The
+   negation cost 4 proof lines, not the "bounded next increment" §9.6.5 predicted as work.
+2. **Vector literals elaborate at the structure field's type.** `tail := ![0, 1, 2]` inside
+   `Network (Fin 3) (Fin 3)` needed no annotation and no coercion — the numerals resolve at `Fin 3`
+   from the expected type. Same pattern as `path3`'s `![0, 1]`, and it is why the graph is 4 lines.
+3. **A harmless `<;> ring` is a *new warning* under the zero-new-warnings standard.** After
+   `fin_cases e <;> simp [path3, path3Dist]` on the control arm, `simp` had already closed both
+   goals, so the trailing `<;> ring` fired `unusedTactics` **and** `unreachableTactic`. Removing it
+   was required to keep the warning count at the pre-existing 4. Lesson for the campaign: the
+   linters police habits, not just errors.
+4. **TRANSPORT LAW (new, and the reason this receipt exists).** A *foreground* `lake build` or
+   `lake env lean` launched from the agent shell is **SIGTERM'd 6–12 s in** — reproducibly twice,
+   `build_lock.py` reporting `RELEASE rc=-15` and the axiom banner exiting 143 — while **no body
+   governor logs a kill** in the same window (`lean_build_governor` logs `killed=0 frozen=0`,
+   `kill-ledger.jsonl` has no entry, `swap_shedder` and `memory_guardian` are silent). The same
+   command with `start_new_session=True` completes (5.0 s for the banner, 18.5 s for the build).
+   The signal is therefore **group-scoped and external to the body** — the harness's process-group
+   deadline, i.e. exactly the R2125609581 transport discipline — and the cure is on disk:
+   `receipts/build_detached.py` (lock + `lake build` + JSON receipt) and
+   `receipts/run_detached.py` (any command, rc to a file). Do not conclude "the build is broken"
+   from `rc=-15`; conclude "the call was foreground."
+5. **`¬ (… |>.IsFixedPoint x st)` does not parse the way the eye reads it.** The pipeline under a
+   negation binds oddly; write the application form `¬ ((G.toLPData s t).IsFixedPoint x st)`. Dot
+   notation resolves `LPData.IsFixedPoint` from inside `namespace Bonnifaci`, so no qualified name
+   is needed — only the explicit argument.
+
+### 9.8.4 Receipts (three, exact, this tree)
+
+    BUILD     lake build Bonnifaci          exit 0   2261 jobs   receipts/build_triangle.log
+                                                 + receipts/build_triangle.receipt.json
+              driver: receipts/build_detached.py  (start_new_session; single-writer fcntl lock on
+              /Volumes/Substrate-1/bigo/.build.lock; waited 0 s; 18.5 s total)
+              gate: disk free 330Gi unchanged; swap 16492.62M used before and after (it did not grow)
+              (foreground attempts: 2x SIGTERM rc=-15 at 6 s and 12 s — see finding 4)
+    OLEANS    18 present: Model KL Core Optimality Features Feasibility Theorem Thm11
+              Duality Lemma41 Lemma43 Mu M6 M7 M8 ShortestPath NetworkRank **Triangle**
+    AXIOMS    receipts/axioms_triangle.txt — all 6 theorems:
+              depends on axioms: [propext, Classical.choice, Quot.sound]
+              zero `sorry`, zero `axiom` commands in Bonnifaci/*.lean (measured: 3 `sorry`
+              strings in the tree, every one prose — Bonnifaci.lean:32, Thm11.lean:37,
+              M7.lean:34; the two `admit` hits are the word "admits" in Triangle.lean prose).
+              NOTE the line shift: §9.7.4 cited Bonnifaci.lean:31; the new import moved the
+              header docstring's "no sorry" by one line. The *claim* is unchanged, the *address*
+              was measured again rather than copied.
+    WARNINGS  0 contributed by Triangle (`lake env lean Bonnifaci/Triangle.lean` silent, twice);
+              the 4 pre-existing (Thm11 x3, Lemma43 x1) unchanged.
+
+### 9.8.5 What this changes for the campaign
+
+`ShortestPath.lean`'s `fixed_point_potentials_are_distances` is now *precisely* scoped: it is an
+identification conditional on the lengths being conservative, and the triangle exhibits the failure
+of that condition in the smallest possible graph. The non-degenerate content of §2.2 is therefore
+`isShortestPathLength_of_tight` (complementary slackness, no rest point needed) plus
+`dual_feasible_bound` — exactly what `ShortestPath.lean`'s scope note already said, now with a
+counterexample the kernel has checked.
+
+### 9.8.6 Closeout on this pin
+
+What remains on `e684681`-plus-Triangle, measured rather than recalled:
+
+1. **`LPData.HasSolution`** — the one named seam. Its content is global, **two-sided** existence of
+   the Physarum ODE on the positive orthant (SV16, the paper's [18]). M8 supplies the local
+   Lipschitz half; Picard–Lindelöf gives neither the global half nor the two-sided half.
+2. **The ODE library** — the 6616-Mathlib-module closure measured in §9.3 stands. Not attempted
+   here, and not attempted by this increment: nothing in §9.8 wants it.
+3. **`W/μ` tightening** (§9.2, §9.5 item 3) — unchanged, still available, and the cheapest remaining
+   item that is not the seam.
+4. **What a successor should not do**: re-derive the rank bridge, the grounding necessity, or the
+   cycle witness. All three are theorems; §9.7.3 and §9.8.3 carry the method notes that made them
+   cheap, and the transport law (9.8.3 finding 4) is what keeps a successor from filing a phantom
+   "build broken" wound.

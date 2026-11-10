@@ -1,0 +1,31 @@
+[detached_build] ACQUIRED /Volumes/Substrate-1/bigo/.build.lock (waited 0s) at 2026-11-10T10:26:08.230091+00:00
+[detached_build] PRE  swap=total = 17408.00M  used = 16492.62M  free = 915.38M  (encrypted) free=330Gi
+⚠ [2183/2246] Replayed Bonnifaci.Thm11
+warning: Bonnifaci/Thm11.lean:60:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:275:2: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: Bonnifaci/Thm11.lean:334:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [2186/2246] Replayed Bonnifaci.Lemma43
+warning: Bonnifaci/Lemma43.lean:87:5: Variable name `hxstar` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hxstar
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2260/2261] Built Bonnifaci (14s)
+Build completed successfully (2261 jobs).
+[detached_build] RELEASE rc=0 elapsed=18.5s
+[detached_build] POST swap=total = 17408.00M  used = 16492.62M  free = 915.38M  (encrypted) free=330Gi

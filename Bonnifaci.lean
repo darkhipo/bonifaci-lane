@@ -15,6 +15,7 @@ import Bonnifaci.M7
 import Bonnifaci.M8
 import Bonnifaci.ShortestPath
 import Bonnifaci.NetworkRank
+import Bonnifaci.Triangle
 
 /- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 /-!
@@ -52,8 +53,11 @@ Primary source, verified against the full text on 2026-11-10 (STMTS.md §0):
                reduced incidence matrix has full row rank (and the ungrounded one never
                does), so M6/M7's Laplacian layer accepts a network instance with no rank
                hypothesis; the path graph is carried through end to end
+  Triangle     the positive-length-cycle scope witness: the triangle 0 -> 1 -> 2 -> 0 is
+               connected (so the Laplacian layer accepts it) yet admits NO tight potential
+               and NO rest point — §9.6.3's caveat, machine-checked
 
-All seventeen modules above are green inside this target. One named Prop survives,
+All eighteen modules above are green inside this target. One named Prop survives,
 deliberate and documented in STMTS.md §9.3 (the earlier "two" was the pre-M8 count —
 `FlowLipschitzOnOrthant` became a theorem in M8):
 

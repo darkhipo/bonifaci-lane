@@ -1,0 +1,35 @@
+§9.8: the triangle — the positive-length-cycle scope note, machine-checked
+
+New file Bonnifaci/Triangle.lean (148 lines, 7 declarations): the directed cycle
+0 -> 1 -> 2 -> 0, connected (so the Laplacian layer accepts it — Step x exists for
+every x > 0 via the §9.7 rank bridge), yet NO potential is tight on all three edges
+and hence NO rest point exists at any positive tube vector, for any demand.
+
+That closes §9.6.5 item 3 and turns §9.6.3's caveat from prose into a theorem:
+rest points force tightness on every edge, so they exist only for conservative
+lengths. The triangle is the smallest witness of the failure, and a positive
+control sits beside it — path3_tight_potential shows the same tightness system IS
+solvable on the tree, so the negation is about the cycle, not the formulation.
+
+Proof is 4 lines of content: heads 1,2,0 and tails 0,1,2 enumerate the same nodes,
+so sum(P(head e) - P(tail e)) = 0 (Fin.sum_univ_three + ring); tightness makes that
+sum a + b + c, and positivity refutes it (linarith).
+
+Receipts: lake build Bonnifaci exit 0, 2261 jobs (2260 + 1), 18 oleans, Triangle
+built in 9.4 s, 0 new Mathlib modules; axiom banner exit 0 with all 6 theorems on
+[propext, Classical.choice, Quot.sound]; 0 warnings from Triangle (the 4 pre-existing
+Thm11/Lemma43 replays unchanged); sorry census measured, not recalled — 3 strings,
+all prose, none in Triangle.lean.
+
+Transport finding, recorded in §9.8.3: a FOREGROUND lake build from the agent shell
+is SIGTERM'd at 6-12 s (rc=-15) with no body governor logging a kill; the same
+command under start_new_session=True completes. receipts/build_detached.py and
+receipts/run_detached.py now carry that cure, so a successor reads it instead of
+paying for two phantom "build broken" wounds.
+
+Provenance note (env law, measured): the agent-shell `git` is the body's shim,
+which stamps `multiaim git-identity` into GIT_AUTHOR_*/GIT_COMMITTER_* unless
+those vars are already explicit in the caller's environment — so
+`git -c user.name=…` is silently ignored (first attempt authored this commit as
+the pane's identity). Exporting GIT_AUTHOR_NAME/EMAIL + GIT_COMMITTER_NAME/EMAIL
+is the only form that names the mind that actually did the work.
