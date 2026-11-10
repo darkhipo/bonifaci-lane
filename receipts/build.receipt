@@ -1,4 +1,4 @@
-== receipt 2026-11-10T07:20:32Z ==
+== receipt 2026-11-10T07:26:59Z ==
 exit_code=0
 elapsed_s=22
 gate=memory_pressure_free>15%_swapouts_delta=0 (R2125609494)
@@ -13,4 +13,5 @@ olean[Thm11]=PRESENT 723824 bytes
 olean[Duality]=PRESENT 219600 bytes
 olean[Lemma41]=PRESENT 258256 bytes
 olean[Lemma43]=PRESENT 252104 bytes
+olean[Mu]=PRESENT 105864 bytes
 axiom_banner_exit=0

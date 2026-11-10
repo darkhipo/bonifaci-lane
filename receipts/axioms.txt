@@ -9,3 +9,5 @@
 'Bonnifaci.phi_decrease_core' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Bonnifaci.feasibility_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Bonnifaci.edge_no_retirement' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.kl_bound_mu' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.entropy_summand_le' depends on axioms: [propext, Classical.choice, Quot.sound]

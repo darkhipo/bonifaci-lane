@@ -12,3 +12,5 @@ import Bonnifaci
 #print axioms Bonnifaci.phi_decrease_core
 #print axioms Bonnifaci.feasibility_invariant
 #print axioms Bonnifaci.edge_no_retirement
+#print axioms Bonnifaci.kl_bound_mu
+#print axioms Bonnifaci.entropy_summand_le
