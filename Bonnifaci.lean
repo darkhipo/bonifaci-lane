@@ -12,6 +12,7 @@ import Bonnifaci.Lemma43
 import Bonnifaci.Mu
 import Bonnifaci.M6
 import Bonnifaci.M7
+import Bonnifaci.M8
 
 /- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 /-!
@@ -35,12 +36,23 @@ Primary source, verified against the full text on 2026-11-10 (STMTS.md §0):
   Features     edge_no_retirement (campaign constraint (b), as a theorem)
   Feasibility  Prop 3.1 + Lemma 3.2 => P1 DISCHARGED (feasibility_invariant)
   Theorem      the machine-checked statement of Theorem 1.1 with premises P1-P3 named
-
-## Work in progress (deliberately NOT imported; see STMTS.md §7)
-
   Thm11        proof-carrying Theorem 1.1 (statement kept in sync via Theorem.lean)
-  Duality      Prop 2.2 / 2.3 / Lemma 4.2 core (needs Thm11's notation)
+  Duality      Prop 2.2 / 2.3 / Lemma 4.2 core
+  Lemma41/43   the two d/dt bounds (P2, P3)
+  Mu           the mu-corollary (Theorem 1.1, second half)
+  M6           the Laplacian-solve seam DISCHARGED (exists_step from posDef L = A C A^T)
+  M7           the flow map is well defined (existsUnique_flow, qfun, q_eq_qfun)
+  M8           FlowLipschitzOnOrthant DISCHARGED (energy perturbation estimate)
 
-Keeping WIP modules out of the root import keeps the build target green and the
-receipts honest: a red file never hides behind a green target.
+All fifteen modules above are green inside this target. Two named Props survive, both
+deliberate and both documented in STMTS.md §9:
+
+  `LPData.HasSolution`      — global existence of the trajectory (SV16, the paper's [18]).
+                              Kept named: the ODE library it would need closes over 6616
+                              unbuilt modules on this pin, and the statement asks for a
+                              global two-sided solution, which Picard-Lindeloef does not
+                              give. Its analytic hypothesis is no longer a gap: M8 proves
+                              the flow and the ODE right-hand side are locally Lipschitz.
+
+Anything added here must build green. A red file never hides behind a green target.
 -/

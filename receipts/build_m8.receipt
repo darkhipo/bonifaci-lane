@@ -1,0 +1,16 @@
+BUILD RECEIPT — M8 (FlowLipschitzOnOrthant discharged)
+base commit : 4c03db6 (+ M8 working tree)
+date        : 2026-11-10T09:45:26Z
+lock        : receipts/build_lock.py fcntl single-writer on /Volumes/Substrate-1/bigo/.build.lock
+gate        : free 71%%, swap not growing (19400M -> 16351M over 20s)
+command     : lake build Bonnifaci
+
+RESULT      : exit 0, 2258 jobs, Build completed successfully
+WARNINGS    : 4, all pre-existing (Thm11 x3 push_neg/simpa, Lemma43 x1 unused var); M8 contributes 0
+ERRORS      : 0
+
+--- lake build Bonnifaci (tail) ---
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+Build completed successfully (2258 jobs).
+[build_lock] RELEASE rc=0 elapsed=3s

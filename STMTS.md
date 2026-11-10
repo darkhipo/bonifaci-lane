@@ -578,3 +578,133 @@ tree — those receipts now come from the restored modules, not from a rebuild.
 2. With Lipschitz in hand, the Picard–Lindelöf step itself (Mathlib `ODE`) — measure
    before promising; the ODE layer may exceed this workspace's built set.
 3. Only then M8 (shortest-path instantiation: signed incidence, unit s-t demand).
+
+---
+
+# §9 — 2026-11-10 (session 3): `FlowLipschitzOnOrthant` DISCHARGED; `HasSolution` position fixed by measurement
+
+Successor of the M6/M7 session. M7 left two named Props. **One of them is now a theorem.**
+The other is kept named — and this session measured why, rather than asserting it.
+
+## 9.1 The measurement that decided the route (task 1, as instructed)
+
+Tool written and kept: `receipts/closure_cost.py` (read-only; walks the transitive import
+closure of a module across every lake package and counts modules with **no built `.olean`**).
+Lock wrapper written and kept: `receipts/build_lock.py` (fcntl single-writer; macOS has no
+`flock(1)` — the ledger's "flock" instruction is satisfied by this wrapper).
+
+| candidate module | on pin `d13f23b7` | UNBUILT modules to compile first |
+|---|---|---|
+| `Mathlib.Analysis.Normed.Algebra.Inverse` | **ABSENT** | — |
+| `Mathlib.Analysis.Normed.Algebra.Basic` | present | **6616** |
+| `Mathlib.Analysis.Normed.Module.ContinuousInverse` | present | **190** |
+| `Mathlib.LinearAlgebra.Matrix.NonsingularInverse` (adjugate/det) | present | **72** |
+| `Mathlib.Analysis.Calculus.Deriv.Inv` | present | 2 |
+| `Mathlib.Analysis.Normed.Field.Lemmas` (scalar `inv` continuity only) | present | 2 |
+| `Mathlib.Algebra.Order.BigOperators.Ring.Finset` | present, **already imported by `Model`** | **0** |
+
+**Two findings, both worth more than the table:**
+
+1. **The M7 header named a module this pin does not have.** `Mathlib.Analysis.Normed.Algebra.Inverse`
+   has no `.lean` file anywhere in the package tree. It is a name recalled from a newer Mathlib.
+   A plan that cites it is a plan against a library that is not here. (Same class as §8.3's
+   `Matrix.mulVec_injective_iff_isUnit` cost lesson, but worse: that one existed and was expensive;
+   this one does not exist.)
+2. **The cheap path was not on the proposed list at all.** Both suggested routes (Neumann-series
+   perturbation, adjugate/det) cost 72–6616 modules. The route actually taken costs **0 new
+   imports**, because it never inverts a matrix.
+
+## 9.2 The route taken — an energy perturbation estimate (0 new imports)
+
+For two strictly positive points `x`, `y` with flows `q`, `q'`: both are Kirchhoff flows for
+the same `b`, so `g = q − q'` is **Kirchhoff-homogeneous** (`A g = 0`). Ohm's law at the two
+points differs only by the resistance mismatch `s_e = q'_e (c_e/y_e − c_e/x_e)`; multiplying
+the differenced Ohm law by `g_e` and summing kills the potential term:
+
+> `∑_e (c_e/x_e) g_e² = ∑_e s_e g_e`   (`LPData.energy_perturb`)
+
+Everything after that is finite real arithmetic. Bounding `|s_e|` needs `q'` bounded on the
+ball, which is **Thomson's principle at `y` tested against the fixed flow `q`** (`q'_sq_le`) —
+no solve at `y` is ever performed — plus `y_e ∈ [x_e/2, 3x_e/2]` from the ball radius. The
+`2|a| ≤ 1 + a²` AM–GM step (`mis_le`) is what keeps the whole estimate free of square roots
+until the single closing `|d_e| ≤ √(∑ d²)`.
+
+Seven new declarations, all proved, all `[propext, Classical.choice, Quot.sound]`:
+
+| declaration | content |
+|---|---|
+| `LPData.ohm_res_sub` | differenced Ohm law: only the resistance mismatch remains |
+| `LPData.energy_perturb` | **the identity** `∑(c/x)g² = ∑ s g`; potential term vanishes |
+| `LPData.q'_sq_le` | Thomson at `y` vs the fixed flow `q` bounds `q'` by data at `x` |
+| `LPData.mis_le` | `|s_e| ≤ W_e·|y_e − x_e|`, no square root (AM–GM) |
+| `LPData.flowLipschitzOnOrthant` | **`d.FlowLipschitzOnOrthant`**: seam 1 DISCHARGED |
+| `LPData.RhsLipschitzOnOrthant` | the hypothesis stated on the ODE **right-hand side** |
+| `LPData.rhsLipschitzOnOrthant` | `FlowLipschitzOnOrthant → RhsLipschitzOnOrthant` (K+1) |
+
+The two private helpers `div_le_two_div`, `two_div_three_le_div`, `one_div_mul_le` are
+deliberately `private` and proved by multiplying through by positive denominators — this pin
+does not have a stable `div_le_div_iff_of_pos` surface, and the multiplication form does not
+drift with the library.
+
+**Honest scope note.** The constant `K` is *explicit but not tight*: it is `W/μ` where `μ` is
+the smallest conductance `c_e/x_e` and `W` the largest mismatch coefficient. Nothing here
+claims a sharp Lipschitz constant, and nothing needs one — Picard–Lindelöf consumes only
+existence of some `K` on some ball.
+
+## 9.3 `HasSolution` — kept named, and the reason is a measurement, not a preference
+
+Task 3 asked for a decision and an honest statement. **Decision: seam 2 stays a named Prop.**
+Evidence:
+
+| route to `HasSolution` | measured cost |
+|---|---|
+| `Mathlib.Analysis.ODE.ExistUnique` (Picard–Lindelöf) | **6616 unbuilt modules** |
+| `Mathlib.Analysis.ODE.Gronwall` | **6616** |
+| `Mathlib.Analysis.ODE.PicardLindelof` | **6616** |
+
+The entire ODE layer sits behind the same normed-space tower as `Normed.Algebra.Basic`. That is
+not a bounded increment on this pin; it is the 6616-module build.
+
+**And the measurement is not the only objection — the statement is stronger than PL.** `LPData.Solution`
+quantifies over **all `t : ℝ`** (including negative times) with strict positivity everywhere.
+Picard–Lindelöf yields a **local, forward** solution. Closing `HasSolution` therefore needs
+(a) the ODE library, (b) a global-extension/maximal-interval argument, and (c) two-sidedness.
+SV16 [Straszak–Vishnoi, Thm 1.1] is a genuine separate theorem for (b)+(c), exactly as §2 always
+said. Claiming PL would "give" `HasSolution` would be false, and this ledger will not say it.
+
+**What the seam looks like now, stated precisely.** Before M8, `HasSolution` sat next to an
+unproved analytic hypothesis, so a reader could not tell whether the analysis or the existence
+theory was the gap. After M8 the decomposition is exact and one half is closed:
+
+* **CLOSED (this session):** local Lipschitz continuity of the flow, and of the ODE right-hand
+  side `x ↦ q(x) − x` — the analytic hypothesis PL consumes.
+* **OPEN:** the ODE library's own build cost (6616), plus global/two-sided existence (SV16).
+* **Already available for forward invariance:** `Features.edge_no_retirement` is the monotone
+  comparison that keeps `x_e(t) ≥ x_e(0)e^{-t}` once a trajectory exists.
+
+No consumer of `thm11` reads `HasSolution`, so nothing downstream is blocked by keeping it named;
+`Theorem.lean`'s premise list (P1–P3) is unchanged.
+
+## 9.4 Receipts (three, exact, this tree at HEAD-parent `4c03db6` + M8)
+
+    BUILD     lake build Bonnifaci          exit 0   2258 jobs   receipts/build_m8.receipt
+              lake env lean Bonnifaci/M8.lean   0 errors, 0 warnings
+              (driver: receipts/build_lock.py fcntl single-writer on
+               /Volumes/Substrate-1/bigo/.build.lock; live-pressure gate GO:
+               free 71%, swap NOT growing 19400M -> 16351M over 20s)
+    OLEANS    15 present: Model KL Core Optimality Features Feasibility Theorem Thm11
+              Duality Lemma41 Lemma43 Mu M6 M7 **M8**
+    AXIOMS    receipts/axioms_m8.txt — every new declaration:
+              depends on axioms: [propext, Classical.choice, Quot.sound]
+              zero `sorry`, zero `axiom` commands anywhere in Bonnifaci/*.lean
+    WARNINGS  0 contributed by M8 (the 4 pre-existing warnings in Thm11/Lemma43 are unchanged)
+
+## 9.5 Next
+
+1. **M8 shortest-path instantiation** (signed incidence, unit s-t demand) — the only remaining
+   milestone that is cheap on this pin. Budget a bounded spike on the incidence plumbing first.
+2. `HasSolution` only if the 6616-module ODE closure is ever built deliberately (a scheduling
+   decision, not a proof decision). Until then the seam is named and its closed half is recorded
+   in §9.3.
+3. If a successor wants a *sharp* Lipschitz constant, `W/μ` in §9.2 is the object to tighten;
+   the estimate itself (`energy_perturb`) is the reusable part.

@@ -1,0 +1,12 @@
+[build_lock] ACQUIRED /Volumes/Substrate-1/bigo/.build.lock (waited 0s); cmd=lake env lean probe_axioms8.lean
+'LPData.flowLipschitzOnOrthant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LPData.rhsLipschitzOnOrthant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LPData.energy_perturb' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LPData.q'_sq_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LPData.mis_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LPData.ohm_res_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+@LPData.flowLipschitzOnOrthant : ∀ {N : Type u_1} {E : Type u_2} [inst : Fintype N] [inst_1 : Fintype E] [DecidableEq N]
+  [DecidableEq E] (d : LPData N E), d.FlowLipschitzOnOrthant
+@LPData.rhsLipschitzOnOrthant : ∀ {N : Type u_1} {E : Type u_2} [inst : Fintype N] [inst_1 : Fintype E]
+  [inst_2 : DecidableEq N] [inst_3 : DecidableEq E] (d : LPData N E), d.FlowLipschitzOnOrthant → d.RhsLipschitzOnOrthant
+[build_lock] RELEASE rc=0 elapsed=3s
