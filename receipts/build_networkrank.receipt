@@ -32,11 +32,24 @@ compiled. Measured anyway, against the §9.6.1 constant offset of 2:
 All exactly the baseline 2 (Batteries.Classes.Cast, Mathlib.Data.Sym.Sym2.Init — sources
 present, oleans absent, build green). Difference against baseline: 0, as predicted.
 
-TOOL CAVEAT (new, recorded so the next measure does not re-derive it): closure_cost.py
-searches only .lake/packages, so `closure_cost.py Bonnifaci.M6` reports "SOURCE: ABSENT on
-this pin". The tool can only measure *dependency* modules, not this project's own; the
-intra-project cost must be read from the build itself (10s for a new module, ~2s for the
-root aggregate).
+TOOL DEFECT FOUND AND FIXED (STMTS §9.7.3 finding 6). As originally run, closure_cost.py
+answered a definite false negative for this project's own modules: `closure_cost.py
+Bonnifaci.M6` printed "SOURCE: **ABSENT on this pin**" while Bonnifaci/M6.lean and M6.olean
+were both present. Cause: PACKAGES was [.lake/packages] + [each package subdir]; ROOT was
+never in the list, although this project's layout is identical (ROOT/<Dir>/*.lean, oleans
+under ROOT/.lake/build/lib/lean). ROOT is now prepended (with the failure named in-source).
+
+Verified two-arm after the fix:
+  own modules     Bonnifaci.M6 2045 local / ShortestPath 1981 / NetworkRank 2048,
+                  each UNBUILT 2 = the §9.6.1 constant offset
+  regression arm  Mathlib.Data.Matrix.Mul 1517 and LinearAlgebra.FiniteDimensional.Basic
+                  1738, UNBUILT 2 — IDENTICAL to before the fix, so the number the campaign
+                  reasons with did not move
+
+New measurement this unlocks: importing Bonnifaci.M6 costs +67 local modules (1981 -> 2048),
+all already built — which is why NetworkRank compiled in 10s rather than re-pulling a
+closure. No test suite exists in this repo, so the guard is the in-source comment plus this
+two-arm receipt, not a test.
 
 --- oleans (17) ---
 Core Duality Feasibility Features KL Lemma41 Lemma43 M6 M7 M8 Model Mu

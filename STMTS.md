@@ -889,7 +889,7 @@ would have excluded it — the ground row — is precisely the row that was drop
 at least the evaluation node. `ShortestPath.lean`'s `feasible_sum_b_eq_zero` said this from the
 demand side; this says it from the matrix side.
 
-### 9.7.3 Five findings, all measured on this pin
+### 9.7.3 Six findings, all measured on this pin
 
 1. **`Fintype.sum_eq_add_sum_subtype_ne f g : ∑ i, f i = f g + ∑ i : {i // i ≠ g}, f ↑i`** is the
    exact tool the reduction wanted — the ground row splits off as one additive term, so summing
@@ -921,6 +921,21 @@ demand side; this says it from the matrix side.
    instances are consumed *inside the proof*, the bridge's own statement gains no extra argument —
    the theorem is stated for a bare `[Fintype V] [Fintype E] [DecidableEq V]`, exactly like
    `ShortestPath.lean`'s.
+6. **`receipts/closure_cost.py` answered a definite false negative for this project's own
+   modules.** `closure_cost.py Bonnifaci.M6` printed *"SOURCE: **ABSENT on this pin** (no `.lean`
+   in any package)"* while `Bonnifaci/M6.lean` and its built `M6.olean` were both present. Cause,
+   read off the source: `PACKAGES` was `[.lake/packages] + [each package subdir]`, and the project
+   root — whose modules have exactly the same layout, `ROOT/<Dir>/*.lean` with oleans under
+   `ROOT/.lake/build/lib/lean` — was never in the list. Both `find_source` and `is_built` read that
+   list, so the tool also mis-classified our own oleans as unbuilt. **Fixed** (ROOT prepended,
+   with the failure named in-source) and verified two-arm: own modules now resolve
+   (`Bonnifaci.M6` closure 2045, `ShortestPath` 1981, `NetworkRank` 2048, each UNBUILT 2 = the
+   §9.6.1 constant offset), and the Mathlib baseline is unchanged (Matrix.Mul 1517,
+   FiniteDimensional.Basic 1738, UNBUILT 2 both) — the fix does not move the number the campaign
+   reasons with. The fix also yields the measurement this milestone could not make before:
+   **importing M6 costs +67 local modules** (1981 → 2048), all already built, which is *why* the
+   new module compiled in 10s instead of re-pulling a closure. Registered as a lane wound; no test
+   suite exists in this repo, so the guard is the in-source comment plus this two-arm receipt.
 
 ### 9.7.4 Receipts (three, exact, this tree)
 
@@ -942,9 +957,13 @@ demand side; this says it from the matrix side.
     CLOSURE   the one new import is Bonnifaci.M6 (our own, already built). Its Mathlib closure
               (Matrix.Mul 1517, ToLin 1642, FiniteDimensional.Basic 1738) reports UNBUILT 2 in
               every case — the §9.6.1 constant offset, difference against baseline 0.
-              TOOL CAVEAT, new: `closure_cost.py Bonnifaci.M6` answers "SOURCE: ABSENT on this
-              pin" — the tool scans only .lake/packages, so it cannot measure this project's own
-              modules. Intra-project cost must be read from the build (10s new module, 2.1s root).
+              TOOL DEFECT FOUND AND FIXED (§9.7.3 finding 6): `closure_cost.py Bonnifaci.M6`
+              answered "SOURCE: ABSENT on this pin" for a module that exists — it scanned only
+              .lake/packages, never ROOT. ROOT is now prepended; re-measured AFTER the fix:
+              Bonnifaci.M6 2045 / ShortestPath 1981 / NetworkRank 2048 local modules, each
+              UNBUILT 2 (constant offset), Mathlib baseline UNCHANGED (Matrix.Mul 1517,
+              FiniteDimensional.Basic 1738, UNBUILT 2). So importing M6 costs +67 local modules,
+              all already built — which is why NetworkRank compiled in 10s.
 
 ### 9.7.5 What this changes for the campaign
 

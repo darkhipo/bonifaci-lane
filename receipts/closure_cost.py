@@ -16,7 +16,14 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PKGS = os.path.join(ROOT, ".lake/packages")
-PACKAGES = [PKGS] + [os.path.join(PKGS, p) for p in sorted(os.listdir(PKGS))]
+# ROOT comes first: this project's own modules live at ROOT/<Dir>/*.lean with oleans at
+# ROOT/.lake/build/lib/lean/..., i.e. the same shape as a package, but ROOT is not itself
+# under .lake/packages. Without it every own-module query answered a definite
+# "SOURCE: **ABSENT on this pin**" for a module that plainly exists (wound R-filed §9.7;
+# measured on `closure_cost.py Bonnifaci.M6` while Bonnifaci/M6.lean and M6.olean were both
+# present). The same list feeds `is_built`, so omitting ROOT also mis-classified our own
+# oleans as unbuilt.
+PACKAGES = [ROOT, PKGS] + [os.path.join(PKGS, p) for p in sorted(os.listdir(PKGS))]
 
 IMPORT_RE = re.compile(r"^\s*(?:public\s+)?import\s+([A-Za-z0-9_.'«»]+)", re.M)
 
@@ -78,7 +85,7 @@ def closure(mod):
 
 def report(mod):
     if find_source(mod) is None:
-        print(f"{mod}\n  SOURCE: **ABSENT on this pin** (no .lean in any package)")
+        print(f"{mod}\n  SOURCE: **ABSENT** (no .lean under the project root or any lake package)")
         return
     mods, external = closure(mod)
     unbuilt = sorted(m for m in mods if not is_built(m))
