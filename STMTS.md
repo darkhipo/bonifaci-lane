@@ -934,8 +934,10 @@ demand side; this says it from the matrix side.
     AXIOMS    receipts/axioms_networkrank.txt — all 17 new theorems:
               depends on axioms: [propext, Classical.choice, Quot.sound]
               zero `sorry`, zero `axiom` commands anywhere in Bonnifaci/*.lean
-              (the only `sorry` strings in the tree remain prose in M7/Thm11/Model docstrings
-              and the two in ShortestPath's scope note)
+              (measured: exactly 3 `sorry` strings in the whole tree, all prose —
+              Bonnifaci.lean:31, Thm11.lean:37, M7.lean:34. ShortestPath.lean and
+              NetworkRank.lean contain none. §9.6.4's "only two" was M7/Thm11 alone,
+              having not counted the root aggregate's header.)
     WARNINGS  0 contributed by NetworkRank; the 4 pre-existing (Thm11 x3, Lemma43 x1) unchanged
     CLOSURE   the one new import is Bonnifaci.M6 (our own, already built). Its Mathlib closure
               (Matrix.Mul 1517, ToLin 1642, FiniteDimensional.Basic 1738) reports UNBUILT 2 in
@@ -956,8 +958,9 @@ existence — the analytic content of §9.3, unchanged, with its algebra no long
 1. **`HasSolution`** is now the *only* named seam on the network instance class, and §9.3's
    measurement stands (6616 modules of ODE library, plus global two-sided existence).
 2. **A positive-length-cycle instance** (§9.6.5 item 3) is now cheaper than it was: `path3_connected`
-   shows how cheap a connectivity proof of a concrete graph is, and the triangle needs only one more
-   `fin_cases` arm. It would make §9.6.3's scope note machine-checkable.
+   shows how cheap a connectivity proof of a concrete graph is — a triangle needs the same
+   three-node case split, not more — so the remaining work there is the *negation* of the dual
+   feasibility system, not the connectivity. It would make §9.6.3's scope note machine-checkable.
 3. **`W/μ` tightening** (§9.2, §9.5 item 3) is unchanged and still available.
 4. **A general bridge** — `Connected` ⇒ full row rank for an arbitrary `LPData` whose rows come from
    a network-like incidence — is *not* done and not obviously worth it: the specific statement above

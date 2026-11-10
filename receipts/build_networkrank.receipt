@@ -46,9 +46,10 @@ NetworkRank Optimality ShortestPath Theorem Thm11
 --- axioms (receipts/axioms_networkrank.txt, exit 0) ---
 17 new theorems, every one:
     depends on axioms: [propext, Classical.choice, Quot.sound]
-zero `sorry`, zero `axiom` commands in Bonnifaci/*.lean (the only `sorry` strings in the
-tree remain prose in M7/Thm11/Model docstrings, and the two in ShortestPath's scope notes
-are the word inside backticks).
+zero `sorry`, zero `axiom` commands in Bonnifaci/*.lean. Measured, not assumed: exactly 3
+`sorry` strings exist in the tree and every one is prose — Bonnifaci.lean:31,
+Thm11.lean:37, M7.lean:34. ShortestPath.lean and NetworkRank.lean contain none.
+(§9.6.4 said "two", counting only M7/Thm11 and missing the root aggregate's header.)
 
 --- file ---
 Bonnifaci/NetworkRank.lean  16366 bytes; 20 declarations (3 defs: Adj, Connected,
