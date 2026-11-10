@@ -773,6 +773,10 @@ needs it: every identity and the whole duality argument are rank-free. Grounding
 its *other* job — fixing the potential gauge — and that is what turns the difference `p t − p s`
 into `p t` itself in `distance_from_grounded_source`.
 
+*(Closed in §9.7: `Network.groundLPData_fullRowRank` proves it from connectivity, and
+`Network.groundLPData_fullRowRank_iff` proves connectivity is also necessary. The paragraph above
+is left as written — it is the state of §9.6, not a live gap.)*
+
 ### 9.6.3 The identification corollary
 
 `Network.IsShortestPathLength s t L` is the §2.2 LP's optimality predicate: some nonnegative flow
@@ -832,3 +836,129 @@ interior rest point does exist there.
    dual-feasible tight potential exists on the triangle. Stated as non-existence, so it needs the
    negation of the dual-feasibility system at a concrete graph — a bounded next increment.
 4. `W/μ` tightening (§9.2/§9.5 item 3) is unchanged and still available.
+
+## 9.7 The connectivity → `FullRowRank` bridge — §9.6.5 item 2, discharged
+
+The one hypothesis §9.6 used and did not prove is now a theorem, and it is an *equivalence*: for a
+`Network`, M6/M7's rank precondition **is** graph connectivity of the grounded network. New file:
+`Bonnifaci/NetworkRank.lean` (16366 bytes, 20 declarations: 3 definitions, 17 theorems). Root
+target grew from 2259 to 2260 jobs; **17 oleans**; one new import, and it is our own module (`M6`),
+not a Mathlib one.
+
+### 9.7.1 What is proved
+
+| declaration | content |
+|---|---|
+| `Network.Adj` | undirected adjacency: `v` and `w` are the two ends of some edge, in either order |
+| `Network.adj_comm` | `Adj` is symmetric |
+| `Network.eq_of_adj` | one step: an edge-invariant `P` agrees on any adjacent pair |
+| `Network.eq_of_reflTransGen` | **the reachability induction**: invariant along one edge ⇒ along a chain |
+| `Network.reflTransGen_comm` | a chain can be walked backwards |
+| `Network.Connected` | `∀ v w, ReflTransGen Adj v w` |
+| `Network.eq_const_of_connected` | connectedness consumed: edge-invariant ⇒ constant |
+| `Network.groundLPData` | **the grounded reduction of footnote 1**: same incidence/demand/lengths indexed by `{v // v ≠ g}` |
+| `Network.groundLPData_A` | the reduced rows are the network's rows, restricted (definitional) |
+| `Network.groundLPData_fullRowRank_of_rooted` | reachability from `g` ⇒ `FullRowRank` — the actual proof |
+| `Network.groundLPData_fullRowRank` | **the bridge**: `G.Connected → (G.groundLPData s t g).FullRowRank` |
+| `Network.connected_of_groundLPData_fullRowRank` | **the converse**: full row rank ⇒ every node reachable from `g` |
+| `Network.groundLPData_fullRowRank_iff` | **connectivity ⇔ full row rank** |
+| `Network.toLPData_not_fullRowRank` | **grounding is necessary**: the ungrounded `toLPData` is *never* full row rank |
+| `Network.groundLPData_exists_step` | **the consumer**: a connected network inhabits M6's `Step x` for every `x > 0` |
+| `path3_connected` | the path graph `0 → 1 → 2` is connected |
+| `path3_groundLPData_fullRowRank` | the grounded path graph has full row rank — first concrete instance |
+| `path3_toLPData_not_fullRowRank` | *the same graph*, ungrounded: rank-deficient |
+| `path3_groundLPData_b` | grounding at the source turns the unit `0`–`2` demand into the unit vector at the sink |
+| `path3_groundLPData_step_nonempty` | **end to end**: the path graph inhabits `Step x` with Kirchhoff, Ohm, and Thomson |
+
+### 9.7.2 The proof, and why it is short
+
+`FullRowRank` unfolds to: `∑_v A_{ve} p_v = 0` for every edge ⇒ `p = 0`. By
+`Network.A_mul_potential` the hypothesis reads `p(head e) = p(tail e)`, so the whole content is
+*"a function constant across every edge of a connected graph is constant"*. Extend `p` to all of
+`V` by `P g = 0`, split the `V`-sum at the ground node with
+`Fintype.sum_eq_add_sum_subtype_ne`, and note the ground term carries the factor `P g = 0` — the
+surviving terms are exactly the reduced system's equations — so `P` is edge-invariant; connectivity
+then propagates `P g = 0` everywhere. No search tree, no determinant, no rank-nullity.
+
+**The converse is the reason the bridge is not a sufficient condition with slack.** If a node `w` is
+unreachable from `g`, the indicator of the unreachable set is a nonzero kernel vector: reachability
+is closed under adjacency (so every reduced row reads `0 − 0` or `1 − 1`), and the one row that
+would have excluded it — the ground row — is precisely the row that was dropped. Hence
+`FullRowRank ↔ ` reachability, and, by `toLPData_not_fullRowRank`, grounding is not cosmetic:
+`1⃗` is a nonzero kernel vector of the *ungrounded* incidence for every `Network` on a node set with
+at least the evaluation node. `ShortestPath.lean`'s `feasible_sum_b_eq_zero` said this from the
+demand side; this says it from the matrix side.
+
+### 9.7.3 Five findings, all measured on this pin
+
+1. **`Fintype.sum_eq_add_sum_subtype_ne f g : ∑ i, f i = f g + ∑ i : {i // i ≠ g}, f ↑i`** is the
+   exact tool the reduction wanted — the ground row splits off as one additive term, so summing
+   over the punctured subtype needs no `sum_bij`, no `Equiv`, no `Finset.sum_subtype` plumbing.
+   (`Finset.sum_subtype`, `Finset.sum_coe_sort`, `Finset.sum_attach` all exist and all were probed
+   first; the `Fintype` one is the shortest path by a wide margin.) This is why the reduction is
+   stated as a subtype rather than as `Finset.erase`.
+2. **`Relation.ReflTransGen` has exactly two constructors, `refl` and `tail`.** `head` is a *derived*
+   lemma, so `induction h with | refl | head | tail` fails with *"Invalid alternative name `head`:
+   There are no unhandled alternatives"*. The chain-walking proof must be written as `tail` + a
+   symmetry step (`reflTransGen_comm`), which is also how the backwards direction gets in.
+3. **Every `if`/`dite` lemma used reflexively is deprecated on this pin.** Measured: `if_pos` →
+   `ite_eq_left`, `if_neg` → `ite_eq_right`, `dif_pos` → `dite_eq_left`, `dif_neg` →
+   `dite_eq_right`, each emitting a warning at use site. Since this lane's receipt standard is
+   *zero new warnings*, the indicator function in the converse proof is discharged by
+   `by_cases` + `simp [hyp]` (passing the *proof* as a simp lemma, so `simp` reduces the `ite`
+   condition to `True`/`False`), never by `rw [if_pos …]`. `simp` internally uses the
+   non-deprecated names, so it is warning-free.
+4. **`rw` will not beta-reduce under a `set`-alias of a lambda, and `rw … at h` can close the goal
+   by itself.** `set Q : V → ℝ := fun v => if … ` then `rw [hQ, if_pos …]` fails with *"Did not
+   find an occurrence of the pattern"*, because after `rw [hQ]` the redex is `(fun v => …) g` and
+   `rw` matches syntactically. `show`/`exact`/`simpa` beta-reduce (defeq), `rw` does not. The
+   mirror-image trap: `rw [hstep] at hzero; exact hzero` reports *"No goals to be solved"* because
+   the rewrite at the hypothesis already closed the goal — so where a hypothesis is *transported*
+   rather than rewritten, `exact hstep ▸ hzero` is the robust form.
+5. **The consumer's typeclass requirements are M6's, not the bridge's.** `exists_step` carries
+   `[DecidableEq N] [DecidableEq E]` in M6's section variables, so `groundLPData_exists_step` needs
+   a local `classical` to synthesize `DecidableEq {v // v ≠ g}` and `DecidableEq E`. Because the
+   instances are consumed *inside the proof*, the bridge's own statement gains no extra argument —
+   the theorem is stated for a bare `[Fintype V] [Fintype E] [DecidableEq V]`, exactly like
+   `ShortestPath.lean`'s.
+
+### 9.7.4 Receipts (three, exact, this tree)
+
+    BUILD     lake build Bonnifaci          exit 0   2260 jobs   receipts/build_networkrank.receipt
+              lake env lean Bonnifaci/NetworkRank.lean   0 errors, 0 warnings, silent
+              (driver: receipts/build_lock.py fcntl single-writer on
+               /Volumes/Substrate-1/bigo/.build.lock; gate GO: disk free 330Gi unchanged,
+               swap NOT growing 16628.62M -> 16620.62M across the lock window — it fell)
+    OLEANS    17 present: Model KL Core Optimality Features Feasibility Theorem Thm11
+              Duality Lemma41 Lemma43 Mu M6 M7 M8 ShortestPath **NetworkRank**
+    AXIOMS    receipts/axioms_networkrank.txt — all 17 new theorems:
+              depends on axioms: [propext, Classical.choice, Quot.sound]
+              zero `sorry`, zero `axiom` commands anywhere in Bonnifaci/*.lean
+              (the only `sorry` strings in the tree remain prose in M7/Thm11/Model docstrings
+              and the two in ShortestPath's scope note)
+    WARNINGS  0 contributed by NetworkRank; the 4 pre-existing (Thm11 x3, Lemma43 x1) unchanged
+    CLOSURE   the one new import is Bonnifaci.M6 (our own, already built). Its Mathlib closure
+              (Matrix.Mul 1517, ToLin 1642, FiniteDimensional.Basic 1738) reports UNBUILT 2 in
+              every case — the §9.6.1 constant offset, difference against baseline 0.
+              TOOL CAVEAT, new: `closure_cost.py Bonnifaci.M6` answers "SOURCE: ABSENT on this
+              pin" — the tool scans only .lake/packages, so it cannot measure this project's own
+              modules. Intra-project cost must be read from the build (10s new module, 2.1s root).
+
+### 9.7.5 What this changes for the campaign
+
+`LPData.HasSolution` (M7) is `∀ s, (∀ e, 0 < s e) → d.FullRowRank → ∃ S : d.Solution, S.x 0 = s`.
+For a **connected network instance** one of those three hypotheses is now discharged by
+`groundLPData_fullRowRank`, so the named premise on that instance class is exactly global ODE
+existence — the analytic content of §9.3, unchanged, with its algebra no longer entangled.
+
+### 9.7.6 Next
+
+1. **`HasSolution`** is now the *only* named seam on the network instance class, and §9.3's
+   measurement stands (6616 modules of ODE library, plus global two-sided existence).
+2. **A positive-length-cycle instance** (§9.6.5 item 3) is now cheaper than it was: `path3_connected`
+   shows how cheap a connectivity proof of a concrete graph is, and the triangle needs only one more
+   `fin_cases` arm. It would make §9.6.3's scope note machine-checkable.
+3. **`W/μ` tightening** (§9.2, §9.5 item 3) is unchanged and still available.
+4. **A general bridge** — `Connected` ⇒ full row rank for an arbitrary `LPData` whose rows come from
+   a network-like incidence — is *not* done and not obviously worth it: the specific statement above
+   is what the §2.2 instance class needs, and generality here would buy nothing the campaign uses.

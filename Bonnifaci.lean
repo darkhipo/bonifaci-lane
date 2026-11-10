@@ -14,6 +14,7 @@ import Bonnifaci.M6
 import Bonnifaci.M7
 import Bonnifaci.M8
 import Bonnifaci.ShortestPath
+import Bonnifaci.NetworkRank
 
 /- Copyright (c) 2026 MultiAgency bonifaci-lane. -/
 /-!
@@ -47,8 +48,12 @@ Primary source, verified against the full text on 2026-11-10 (STMTS.md §0):
   ShortestPath the network case of §2.2: signed incidence, unit s-t demand, and the
                shortest-path identification corollary (at a rest point the Kirchhoff
                potentials are a shortest-path distance function)
+  NetworkRank  the connectivity -> FullRowRank bridge: a connected network's grounded
+               reduced incidence matrix has full row rank (and the ungrounded one never
+               does), so M6/M7's Laplacian layer accepts a network instance with no rank
+               hypothesis; the path graph is carried through end to end
 
-All sixteen modules above are green inside this target. One named Prop survives,
+All seventeen modules above are green inside this target. One named Prop survives,
 deliberate and documented in STMTS.md §9.3 (the earlier "two" was the pre-M8 count —
 `FlowLipschitzOnOrthant` became a theorem in M8):
 

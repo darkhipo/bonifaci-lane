@@ -1,0 +1,55 @@
+BUILD RECEIPT — §9.7 (the connectivity -> FullRowRank bridge)
+base commit : e317bfe (M8b) + NetworkRank working tree
+date        : 2026-11-10T10:13:55Z..10:15:34Z
+lock        : receipts/build_lock.py fcntl single-writer on /Volumes/Substrate-1/bigo/.build.lock
+gate        : disk free 330Gi (92% used, unchanged); swap NOT growing while the lock was
+              held (used 16628.62M -> 16620.62M, i.e. it fell)
+command     : lake build Bonnifaci
+
+RESULT      : exit 0, 2260 jobs (was 2259 before NetworkRank), Build completed successfully
+NEW MODULES : 1  (Bonnifaci.NetworkRank — built in 10s). 0 new Mathlib modules pulled.
+WARNINGS    : 4, all pre-existing replays (Thm11 x3 push_neg/simpa; Lemma43 x1 unused var);
+              NetworkRank contributes 0  (lake env lean Bonnifaci/NetworkRank.lean: silent —
+              no errors, no warnings, no info)
+ERRORS      : 0
+
+--- lake build Bonnifaci (tail) ---
+✔ [2258/2260] Built Bonnifaci.NetworkRank (10s)
+✔ [2259/2260] Built Bonnifaci (2.1s)
+Build completed successfully (2260 jobs).
+[build_lock] RELEASE rc=0 elapsed=18s
+
+--- closure measurement (receipts/closure_cost.py, post-build) ---
+NetworkRank's only new import is Bonnifaci.M6 (for the *name* of the consumer:
+FullRowRank, exists_step). M6 is a pre-existing target member, already built, so its
+Mathlib closure (Matrix.Mul, ToLin, FiniteDimensional.Basic, Linarith, Ring) is already
+compiled. Measured anyway, against the §9.6.1 constant offset of 2:
+
+  Mathlib.Data.Matrix.Mul                          closure 1517  built 1515  UNBUILT 2
+  Mathlib.LinearAlgebra.Matrix.ToLin               closure 1642  built 1640  UNBUILT 2
+  Mathlib.LinearAlgebra.FiniteDimensional.Basic    closure 1738  built 1736  UNBUILT 2
+
+All exactly the baseline 2 (Batteries.Classes.Cast, Mathlib.Data.Sym.Sym2.Init — sources
+present, oleans absent, build green). Difference against baseline: 0, as predicted.
+
+TOOL CAVEAT (new, recorded so the next measure does not re-derive it): closure_cost.py
+searches only .lake/packages, so `closure_cost.py Bonnifaci.M6` reports "SOURCE: ABSENT on
+this pin". The tool can only measure *dependency* modules, not this project's own; the
+intra-project cost must be read from the build itself (10s for a new module, ~2s for the
+root aggregate).
+
+--- oleans (17) ---
+Core Duality Feasibility Features KL Lemma41 Lemma43 M6 M7 M8 Model Mu
+NetworkRank Optimality ShortestPath Theorem Thm11
+    ls .lake/build/lib/lean/Bonnifaci/*.olean | wc -l  ->  17   (16 before + NetworkRank)
+
+--- axioms (receipts/axioms_networkrank.txt, exit 0) ---
+17 new theorems, every one:
+    depends on axioms: [propext, Classical.choice, Quot.sound]
+zero `sorry`, zero `axiom` commands in Bonnifaci/*.lean (the only `sorry` strings in the
+tree remain prose in M7/Thm11/Model docstrings, and the two in ShortestPath's scope notes
+are the word inside backticks).
+
+--- file ---
+Bonnifaci/NetworkRank.lean  16366 bytes; 20 declarations (3 defs: Adj, Connected,
+groundLPData; 17 theorems).

@@ -1,0 +1,29 @@
+'Bonnifaci.Network.adj_comm' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.eq_of_adj' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.eq_of_reflTransGen' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.reflTransGen_comm' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.eq_const_of_connected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.groundLPData_A' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.groundLPData_fullRowRank_of_rooted' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.groundLPData_fullRowRank' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.connected_of_groundLPData_fullRowRank' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.groundLPData_fullRowRank_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.toLPData_not_fullRowRank' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.Network.groundLPData_exists_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.path3_connected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.path3_groundLPData_fullRowRank' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.path3_toLPData_not_fullRowRank' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.path3_groundLPData_b' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Bonnifaci.path3_groundLPData_step_nonempty' depends on axioms: [propext, Classical.choice, Quot.sound]
+@Bonnifaci.Network.groundLPData_fullRowRank : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V] [inst_1 : Fintype E]
+  [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) (s t g : V), G.Connected → (G.groundLPData s t g).FullRowRank
+@Bonnifaci.Network.groundLPData_fullRowRank_iff : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V]
+  [inst_1 : Fintype E] [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) (s t g : V),
+  (G.groundLPData s t g).FullRowRank ↔ ∀ (v : V), Relation.ReflTransGen G.Adj g v
+@Bonnifaci.Network.toLPData_not_fullRowRank : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V] [inst_1 : Fintype E]
+  [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) (s t g : V), ¬(G.toLPData s t).FullRowRank
+@Bonnifaci.Network.groundLPData_exists_step : ∀ {V : Type u_1} {E : Type u_2} [inst : Fintype V] [inst_1 : Fintype E]
+  [inst_2 : DecidableEq V] (G : Bonnifaci.Network V E) (s t g : V),
+  G.Connected → ∀ (x : E → ℝ), (∀ (e : E), 0 < x e) → Nonempty ((G.groundLPData s t g).Step x)
+Bonnifaci.path3_groundLPData_step_nonempty : ∀ (a b : ℝ) (ha : 0 < a) (hb : 0 < b) (x : Fin 2 → ℝ),
+  (∀ (e : Fin 2), 0 < x e) → Nonempty (((Bonnifaci.path3 a b ha hb).groundLPData 0 2 0).Step x)
