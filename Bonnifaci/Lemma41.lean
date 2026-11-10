@@ -107,10 +107,10 @@ theorem cost_log_deriv_le (d : LPData N E) (S : d.Solution) (xstar : E → ℝ) 
       ≤ Real.sqrt (energyAt d S t) / Real.sqrt (d.cost (S.x t)) := by
     rw [← h3]
     exact (div_le_div_iff_of_pos_right hcost).2 hcq
-  have h4 : Real.sqrt (energyAt d S t / d.cost (S.x t))
-      = Real.sqrt (energyAt d S t) / Real.sqrt (d.cost (S.x t)) :=
-        Real.sqrt_div (energyAt d S t)
-  rw [← h4] at h2
+  have h4 : Real.sqrt (energyAt d S t) / Real.sqrt (d.cost (S.x t))
+      = Real.sqrt (energyAt d S t / d.cost (S.x t)) := by
+    rw [Real.sqrt_div]
+  rw [h4] at h2
   linarith
 
 end Bonnifaci
