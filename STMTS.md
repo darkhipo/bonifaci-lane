@@ -53,6 +53,9 @@ Mapping paper → Lean (all finite: `N E : Type*` with `[Fintype]`, vectors as `
 | Φ ≥ 0 (feasible) | `Phi_nonneg` | Thm11 | **PROVED** |
 | Lem 4.1 CS step | `cs_step` | Core | **PROVED** |
 | Lem 4.4 algebra (2-case) | `phi_decrease_core` | Core | **PROVED** |
+| Prop 2.2 (`pᵀb = ℰ`) | `duality_inner` | Duality | **PROVED** (M3 core, drafted ahead) |
+| Prop 2.3 + Ohm (`x*ᵀRq = bᵀp`) | `xstar_Rq_eq` | Duality | **PROVED** (M3 core, drafted ahead) |
+| Lem 4.2 algebraic identity | `lem42_core` | Duality | **PROVED** (M3 core, drafted ahead) |
 | Lem 4.5 `ℰ ≤ cost` | `energy_le_cost` | Thm11 | **PROVED** (from Thomson) |
 | Lem 3.2 feasibility invariance | premise **P1** (`hfeas`) | Thm11 | premise |
 | Lem 4.1 d/dt bound | premise **P2** (`hcostlog`) | Thm11 | premise |
