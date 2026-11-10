@@ -1,40 +1,13 @@
-# bonifaci-lane
+# Bonifaci Thm 1.1 — Lean 4 formalization
 
-Formalization of **Bonifaci 2016, Theorem 1.1** — the Physarum dynamics for linear
-programming, with the KL-type Lyapunov potential and the convex-duality
-identification. Campaign banked road 2 (GLOBAL POTENTIAL).
+**What this is.** A kernel-checked Lean 4 formalization of **Bonifaci's Theorem 1.1** — the convergence-time bound for the natural Physarum-type dynamics for linear programming (*On the Convergence Time of a Natural Dynamics for Linear Programming*, Algorithmica **82**(2):300–315, 2020; arXiv:1611.06729) — plus the μ-bound corollary, the Laplacian-solve (`Step`) discharge, the flow-Lipschitz estimate, the shortest-path instantiation, and the connectivity ⇔ full-row-rank bridge. 18 modules; `lake build Bonnifaci` builds everything in one command; **every declaration checks under exactly `[propext, Classical.choice, Quot.sound]`**; zero `sorry`, zero `axiom` commands (the only `sorry` strings in the tree are prose in docstrings). Build pin: Mathlib `d13f23b7`, Lean v4.34.1.
 
-* **Ledger (read this first):** [STMTS.md](STMTS.md) — verified primary source,
-  statement-fidelity table, named-premise seams, milestone map M0–M8, incidents.
-* **Pins:** Lean `v4.34.1`, Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612`
-  (campaign family).
-* **Anchor DOI:** `10.1007/s00453-019-00615-3` (Algorithmica 82(2):300–315, 2020;
-  arXiv:1611.06729, 2016).
+**State, honestly.** Complete on this pin except one named seam: `LPData.HasSolution` — the global *two-sided* ODE existence the paper cites as [SV16, Thm 1.1]. The local-Lipschitz half of the existence hypothesis is proved here (`FlowLipschitzOnOrthant`, `RhsLipschitzOnOrthant`); Picard–Lindelöf yields only local forward existence, so the gap is stated, not glossed. The `W/μ` constant is explicit, not tight.
 
-## Module family (`Bonnifaci/` — namespace per lane brief)
+**Why it is up.** An unpublished proof is indistinguishable from a claim. This is a re-runnable, reusable, machine-checked anchor for the paper's theorem — the mathematics is Bonifaci's; the formalization exists to be checked, not believed.
 
-| File | Contents |
-|---|---|
-| `Bonnifaci/Model.lean` | `LPData`, `Step` (quarantined Laplacian-solve seam), `Solution` (ODE trajectory) |
-| `Bonnifaci/KL.lean` | finite KL + Gibbs (`KL_nonneg`) |
-| `Bonnifaci/Core.lean` | `cs_step` (Lem 4.1 CS core), `phi_decrease_core` (Lem 4.4 two-case core) |
-| `Bonnifaci/Optimality.lean` | fixed point ⇒ dual tightness ⇒ LP optimality |
-| `Bonnifaci/Features.lean` | `edge_no_retirement` (constraint (b) as a theorem) |
-| `Bonnifaci/Thm11.lean` | **WIP** — proof-carrying `thm11` (statement kept in sync by `Theorem.lean`) |
-| `Bonnifaci/Theorem.lean` | `thm11_statement` — Thm 1.1 as a machine-checked Prop, premises P1–P3 named |
+**What work can be done here.** (1) `LPData.HasSolution` — discharge SV16 (global/two-sided), or the documented-structural route; (2) tighten the `W/μ` Lipschitz constant; (3) the ODE-library route to (1) — measured on this pin at a 6,616-module unbuilt closure (`receipts/closure_cost.py` kept; note its constant offset of 2 in this tree). Successors: do **not** re-derive the rank bridge, grounding necessity, or the triangle cycle witness — they are landed and receipted (`STMTS.md` §9).
 
-No `sorry`, no axioms; analytic gaps are named hypotheses of `thm11` (P1–P3, each with
-a documented downstream discharge route in STMTS.md §2).
+**License.** Released under the [Copy-Free/Stays-Free (CFSF) License](https://github.com/darkhipo/cfsf) — see `LICENSE`. Copy-free: use it for any purpose. Stays-free: nobody gets to fence it.
 
-## Build
-
-Standard `lake build Bonnifaci` against the shared campaign Mathlib (packages are an
-APFS clone of `sssp-nlogn-lane`'s build; re-clone if swept — see STMTS.md §6).
-
-Build discipline on this host: swap gate (`vm.swapusage` > 12 GB ⇒ wait),
-`flock /Volumes/Substrate-1/bigo/.build.lock`, detached `trap "" TERM` launches,
-receipts to `receipts/`.
-
-## Credit
-
-Theorem: Vincenzo Bonifaci (2016/2020). Formalization: this lane, 2026-11-09.
+**Attribution.** Theorem 1.1, the dynamics, the potential, and the shortest-path instance are **Vincenzo Bonifaci's** (the paper above). Construction details follow the paper's own lemmas (4.1–4.4, Prop 3.1, Lemma 3.2, Thm 4.7). The formalization is ours. Statements were verified against the full paper text, not the abstract.
